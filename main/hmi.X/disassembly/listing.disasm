@@ -1,0 +1,2846 @@
+Disassembly Listing for hmi
+Generated From:
+C:/Users/hsaintandre/Desktop/archivos/programacion/firmware/cabezal/hmi.X/dist/default/production/hmi.X.production.elf
+06/11/2018 15:12:24
+
+---  C:/Users/hsaintandre/Desktop/archivos/programacion/firmware/cabezal/hmi.X/tft.c  -------------------
+1:             #include "tft.h"
+2:             
+3:             char bitRead (unsigned int number, unsigned int position) {
+4:                 position = 1 << position;
+1070  C062     MOVFF position, y1
+1072  F064     NOP
+1074  0E01     MOVLW 0x1
+1076  0100     MOVLB 0x0
+1078  6F65     MOVWF 0x65, BANKED
+107A  0E00     MOVLW 0x0
+107C  6F66     MOVWF x2, BANKED
+107E  2B64     INCF y1, F, BANKED
+1080  D003     BRA 0x1088
+1082  90D8     BCF STATUS, 0, ACCESS
+1084  3765     RLCF 0x65, F, BANKED
+1086  3766     RLCF x2, F, BANKED
+1088  2F64     DECFSZ y1, F, BANKED
+108A  D7FB     BRA 0x1082
+108C  C065     MOVFF 0x65, position
+108E  F062     NOP
+1090  C066     MOVFF x2, option
+1092  F063     NOP
+10B2  C003     MOVFF position, y1
+5:                 if (number & position) {
+1094  0100     MOVLB 0x0
+1096  5162     MOVF position, W, BANKED
+1098  1560     ANDWF __pcstackBANK0, W, BANKED
+109A  6F64     MOVWF y1, BANKED
+109C  5163     MOVF option, W, BANKED
+109E  1561     ANDWF cmd, W, BANKED
+10A0  6F65     MOVWF 0x65, BANKED
+10A2  5164     MOVF y1, W, BANKED
+10A4  1165     IORWF 0x65, W, BANKED
+10A6  B4D8     BTFSC STATUS, 2, ACCESS
+10A8  D002     BRA 0x10AE
+10D4  5003     MOVF position, W, ACCESS
+10D6  1401     ANDWF __pcstackCOMRAM, W, ACCESS
+10D8  6E05     MOVWF y1, ACCESS
+10DA  5004     MOVF 0x4, W, ACCESS
+10DC  1402     ANDWF cmd, W, ACCESS
+10DE  6E06     MOVWF 0x6, ACCESS
+10E0  5005     MOVF y1, W, ACCESS
+10E2  1006     IORWF 0x6, W, ACCESS
+10E4  B4D8     BTFSC STATUS, 2, ACCESS
+10E6  D002     BRA 0x10EC
+6:                     return 1;
+10AA  0E01     MOVLW 0x1
+10E8  0E01     MOVLW 0x1
+7:                 } else {
+10AC  0012     RETURN 0
+10EA  0012     RETURN 0
+8:                     return 0;
+10AE  0E00     MOVLW 0x0
+10B0  0012     RETURN 0
+10EC  0E00     MOVLW 0x0
+10EE  0012     RETURN 0
+9:                 }
+10:            }
+11:            
+12:            void lcd_write_bus (char data) {
+11EA  0100     MOVLB 0x0
+11EC  6F60     MOVWF __pcstackBANK0, BANKED
+1212  6E01     MOVWF __pcstackCOMRAM, ACCESS
+13:                BUS = data;
+11EE  C060     MOVFF __pcstackBANK0, LATB
+11F0  FF8A     NOP
+1214  C001     MOVFF __pcstackCOMRAM, LATB
+1216  FF8A     NOP
+14:                LCD_WR = 0; // esto podría ser un problema de sincro
+11F2  9689     BCF LATA, 3, ACCESS
+1218  9689     BCF LATA, 3, ACCESS
+15:                //asm("NOP");   // in case of
+16:                LCD_WR = 1;
+11F4  8689     BSF LATA, 3, ACCESS
+121A  8689     BSF LATA, 3, ACCESS
+17:            }
+0008  825A     BSF btemp, 1, ACCESS
+000A  CFFA     MOVFF PCLATH, 0x2D
+000C  F02D     NOP
+000E  CFFB     MOVFF PCLATU, 0x2E
+0010  F02E     NOP
+0012  CFE9     MOVFF FSR0, 0x2F
+0014  F02F     NOP
+0016  CFEA     MOVFF FSR0H, 0x30
+0018  F030     NOP
+001A  CFE1     MOVFF FSR1, 0x31
+001C  F031     NOP
+001E  CFE2     MOVFF FSR1H, 0x32
+0020  F032     NOP
+0022  CFD9     MOVFF FSR2, 0x33
+0024  F033     NOP
+0026  CFDA     MOVFF FSR2H, 0x34
+0028  F034     NOP
+002A  CFF3     MOVFF PROD, 0x35
+002C  F035     NOP
+002E  CFF4     MOVFF PRODH, 0x36
+0030  F036     NOP
+0032  CFF6     MOVFF TBLPTR, 0x37
+0034  F037     NOP
+0036  CFF7     MOVFF TBLPTRH, 0x38
+0038  F038     NOP
+003A  CFF8     MOVFF TBLPTRU, 0x39
+003C  F039     NOP
+003E  CFF5     MOVFF TABLAT, 0x3A
+0040  F03A     NOP
+0042  C05A     MOVFF btemp, 0x3B
+0044  F03B     NOP
+0046  C05B     MOVFF 0x5B, 0x3C
+0048  F03C     NOP
+004A  C05C     MOVFF 0x5C, 0x3D
+004C  F03D     NOP
+004E  C05D     MOVFF 0x5D, 0x3E
+0050  F03E     NOP
+11F6  0012     RETURN 0
+121C  0012     RETURN 0
+18:            
+19:            void lcd_write_command (char cmd) {
+11D8  0100     MOVLB 0x0
+11DA  6F61     MOVWF cmd, BANKED
+11F8  6E02     MOVWF cmd, ACCESS
+20:                LCD_RS = 0;
+11DC  9489     BCF LATA, 2, ACCESS
+11FA  9489     BCF LATA, 2, ACCESS
+21:                lcd_write_bus(cmd);
+11DE  0100     MOVLB 0x0
+11E0  5161     MOVF cmd, W, BANKED
+11E2  ECF5     CALL 0x11EA, 0
+11E4  F008     NOP
+11FC  5002     MOVF cmd, W, ACCESS
+11FE  EC09     CALL 0x1212, 0
+1200  F009     NOP
+22:                LCD_RS = 1;
+11E6  8489     BSF LATA, 2, ACCESS
+1202  8489     BSF LATA, 2, ACCESS
+23:            }
+11E8  0012     RETURN 0
+1204  0012     RETURN 0
+24:            
+25:            void lcd_set_address (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2) {
+26:                lcd_write_command(0x2A); // column address
+0FDC  0E2A     MOVLW 0x2A
+0FDE  ECEC     CALL 0x11D8, 0
+0FE0  F008     NOP
+10F0  0E2A     MOVLW 0x2A
+27:                lcd_write_bus(x1>>8);
+0FE2  0100     MOVLB 0x0
+0FE4  5163     MOVF option, W, BANKED
+0FE6  ECF5     CALL 0x11EA, 0
+0FE8  F008     NOP
+10F6  5004     MOVF 0x4, W, ACCESS
+10F8  EC09     CALL 0x1212, 0
+10FA  F009     NOP
+28:                lcd_write_bus(x1);
+0FEA  0100     MOVLB 0x0
+0FEC  5162     MOVF position, W, BANKED
+0FEE  ECF5     CALL 0x11EA, 0
+0FF0  F008     NOP
+10FC  5003     MOVF position, W, ACCESS
+10FE  EC09     CALL 0x1212, 0
+1100  F009     NOP
+29:                lcd_write_bus(x2>>8);
+0FF2  0100     MOVLB 0x0
+0FF4  5167     MOVF 0x67, W, BANKED
+0FF6  ECF5     CALL 0x11EA, 0
+0FF8  F008     NOP
+1102  5008     MOVF 0x8, W, ACCESS
+1104  EC09     CALL 0x1212, 0
+1106  F009     NOP
+30:                lcd_write_bus(x2);
+0FFA  0100     MOVLB 0x0
+0FFC  5166     MOVF x2, W, BANKED
+0FFE  ECF5     CALL 0x11EA, 0
+1000  F008     NOP
+1108  5007     MOVF x2, W, ACCESS
+110A  EC09     CALL 0x1212, 0
+110C  F009     NOP
+31:                
+32:                lcd_write_command(0x2B); // page address
+1002  0E2B     MOVLW 0x2B
+1004  ECEC     CALL 0x11D8, 0
+1006  F008     NOP
+110E  0E2B     MOVLW 0x2B
+1110  ECFC     CALL 0x11F8, 0
+1112  F008     NOP
+33:                lcd_write_bus(y1>>8);
+1008  0100     MOVLB 0x0
+100A  5165     MOVF 0x65, W, BANKED
+100C  ECF5     CALL 0x11EA, 0
+100E  F008     NOP
+1114  5006     MOVF 0x6, W, ACCESS
+1116  EC09     CALL 0x1212, 0
+1118  F009     NOP
+34:                lcd_write_bus(y1);
+1010  0100     MOVLB 0x0
+1012  5164     MOVF y1, W, BANKED
+1014  ECF5     CALL 0x11EA, 0
+1016  F008     NOP
+111A  5005     MOVF y1, W, ACCESS
+111C  EC09     CALL 0x1212, 0
+111E  F009     NOP
+35:                lcd_write_bus(y2>>8);
+1018  0100     MOVLB 0x0
+101A  5169     MOVF 0x69, W, BANKED
+101C  ECF5     CALL 0x11EA, 0
+101E  F008     NOP
+1120  500A     MOVF 0xA, W, ACCESS
+1122  EC09     CALL 0x1212, 0
+1124  F009     NOP
+36:                lcd_write_bus(y2);
+1020  0100     MOVLB 0x0
+1022  5168     MOVF y2, W, BANKED
+1024  ECF5     CALL 0x11EA, 0
+1026  F008     NOP
+1126  5009     MOVF y2, W, ACCESS
+1128  EC09     CALL 0x1212, 0
+112A  F009     NOP
+37:            }
+1028  0012     RETURN 0
+112C  0012     RETURN 0
+38:            
+39:            void lcd_memory_start () {
+40:                lcd_write_command(0x2C);
+121E  0E2C     MOVLW 0x2C
+1220  ECEC     CALL 0x11D8, 0
+1222  F008     NOP
+1226  0E2C     MOVLW 0x2C
+41:            }
+1224  0012     RETURN 0
+122C  0012     RETURN 0
+42:            
+43:            void lcd_init () {
+44:                CONTROL = 0xFF; // everything high
+06A8  6889     SETF LATA, ACCESS
+45:                __delay_ms(5);
+06AA  0E68     MOVLW 0x68
+06AC  0100     MOVLB 0x0
+06AE  6F62     MOVWF position, BANKED
+06B0  0EE4     MOVLW 0xE4
+06B2  2EE8     DECFSZ WREG, F, ACCESS
+06B4  D7FE     BRA 0x6B2
+06B6  2F62     DECFSZ position, F, BANKED
+06B8  D7FC     BRA 0x6B2
+06BA  F000     NOP
+46:                LCD_RST = 0;
+06BC  9089     BCF LATA, 0, ACCESS
+47:                __delay_ms(15);
+06BE  0E02     MOVLW 0x2
+06C0  0100     MOVLB 0x0
+06C2  6F63     MOVWF option, BANKED
+06C4  0E38     MOVLW 0x38
+06C6  6F62     MOVWF position, BANKED
+06C8  0EAD     MOVLW 0xAD
+06CA  2EE8     DECFSZ WREG, F, ACCESS
+06CC  D7FE     BRA 0x6CA
+06CE  2F62     DECFSZ position, F, BANKED
+06D0  D7FC     BRA 0x6CA
+06D2  2F63     DECFSZ option, F, BANKED
+06D4  D7FA     BRA 0x6CA
+48:                LCD_RST = 1;
+06D6  8089     BSF LATA, 0, ACCESS
+49:                __delay_ms(15);
+06D8  0E02     MOVLW 0x2
+06DA  0100     MOVLB 0x0
+06DC  6F63     MOVWF option, BANKED
+06DE  0E38     MOVLW 0x38
+06E0  6F62     MOVWF position, BANKED
+06E2  0EAD     MOVLW 0xAD
+06E4  2EE8     DECFSZ WREG, F, ACCESS
+06E6  D7FE     BRA 0x6E4
+06E8  2F62     DECFSZ position, F, BANKED
+06EA  D7FC     BRA 0x6E4
+06EC  2F63     DECFSZ option, F, BANKED
+06EE  D7FA     BRA 0x6E4
+50:                
+51:                LCD_CS = 0;
+06F0  9289     BCF LATA, 1, ACCESS
+52:                
+53:                lcd_write_command(0x11);  // sleep out
+06F2  0E11     MOVLW 0x11
+06F4  ECEC     CALL 0x11D8, 0
+06F6  F008     NOP
+54:                __delay_ms(20);
+06F8  0E02     MOVLW 0x2
+06FA  0100     MOVLB 0x0
+06FC  6F63     MOVWF option, BANKED
+06FE  0EA0     MOVLW 0xA0
+0700  6F62     MOVWF position, BANKED
+0702  0E92     MOVLW 0x92
+0704  2EE8     DECFSZ WREG, F, ACCESS
+0706  D7FE     BRA 0x704
+0708  2F62     DECFSZ position, F, BANKED
+070A  D7FC     BRA 0x704
+070C  2F63     DECFSZ option, F, BANKED
+070E  D7FA     BRA 0x704
+0710  F000     NOP
+55:                lcd_write_command(0xD0);  // power setting
+0712  0ED0     MOVLW 0xD0
+0714  ECEC     CALL 0x11D8, 0
+0716  F008     NOP
+56:                lcd_write_bus(0x07);
+0718  0E07     MOVLW 0x7
+071A  ECF5     CALL 0x11EA, 0
+071C  F008     NOP
+57:                lcd_write_bus(0x42);
+071E  0E42     MOVLW 0x42
+0720  ECF5     CALL 0x11EA, 0
+0722  F008     NOP
+58:                lcd_write_bus(0x18);
+0724  0E18     MOVLW 0x18
+0726  ECF5     CALL 0x11EA, 0
+0728  F008     NOP
+59:            
+60:                lcd_write_command(0xD1);  // VCOM control
+072A  0ED1     MOVLW 0xD1
+072C  ECEC     CALL 0x11D8, 0
+072E  F008     NOP
+61:                lcd_write_bus(0x00);
+0730  0E00     MOVLW 0x0
+0732  ECF5     CALL 0x11EA, 0
+0734  F008     NOP
+62:                lcd_write_bus(0x07);
+0736  0E07     MOVLW 0x7
+0738  ECF5     CALL 0x11EA, 0
+073A  F008     NOP
+63:                lcd_write_bus(0x10);
+073C  0E10     MOVLW 0x10
+073E  ECF5     CALL 0x11EA, 0
+0740  F008     NOP
+64:            
+65:                lcd_write_command(0xD2);  // power setting for normal mode
+0742  0ED2     MOVLW 0xD2
+0744  ECEC     CALL 0x11D8, 0
+0746  F008     NOP
+66:                lcd_write_bus(0x01);
+0748  0E01     MOVLW 0x1
+074A  ECF5     CALL 0x11EA, 0
+074C  F008     NOP
+67:                lcd_write_bus(0x00);
+074E  0E00     MOVLW 0x0
+0750  ECF5     CALL 0x11EA, 0
+0752  F008     NOP
+68:            
+69:                lcd_write_command(0xC0);  // panel driving setting
+0754  0EC0     MOVLW 0xC0
+0756  ECEC     CALL 0x11D8, 0
+0758  F008     NOP
+70:                lcd_write_bus(0x10);
+075A  0E10     MOVLW 0x10
+075C  ECF5     CALL 0x11EA, 0
+075E  F008     NOP
+71:                lcd_write_bus(0x3B);
+0760  0E3B     MOVLW 0x3B
+0762  ECF5     CALL 0x11EA, 0
+0764  F008     NOP
+72:                lcd_write_bus(0x00);
+0766  0E00     MOVLW 0x0
+0768  ECF5     CALL 0x11EA, 0
+076A  F008     NOP
+73:                lcd_write_bus(0x02);
+076C  0E02     MOVLW 0x2
+076E  ECF5     CALL 0x11EA, 0
+0770  F008     NOP
+74:                lcd_write_bus(0x11);
+0772  0E11     MOVLW 0x11
+0774  ECF5     CALL 0x11EA, 0
+0776  F008     NOP
+75:            
+76:                lcd_write_command(0xC5);  // frame rate and inversion control
+0778  0EC5     MOVLW 0xC5
+077A  ECEC     CALL 0x11D8, 0
+077C  F008     NOP
+77:                lcd_write_bus(0x03);
+077E  0E03     MOVLW 0x3
+0780  ECF5     CALL 0x11EA, 0
+0782  F008     NOP
+78:            
+79:                lcd_write_command(0x36);  // address mode
+0784  0E36     MOVLW 0x36
+0786  ECEC     CALL 0x11D8, 0
+0788  F008     NOP
+80:                lcd_write_bus(0x0A); // 
+078A  0E0A     MOVLW 0xA
+078C  ECF5     CALL 0x11EA, 0
+078E  F008     NOP
+81:            
+82:                lcd_write_command(0x3A);  // pixel format
+0790  0E3A     MOVLW 0x3A
+0792  ECEC     CALL 0x11D8, 0
+0794  F008     NOP
+83:                lcd_write_bus(0x55); // 0x55
+0796  0E55     MOVLW 0x55
+0798  ECF5     CALL 0x11EA, 0
+079A  F008     NOP
+84:            
+85:                lcd_write_command(0x2A);  // column address
+079C  0E2A     MOVLW 0x2A
+079E  ECEC     CALL 0x11D8, 0
+07A0  F008     NOP
+86:                lcd_write_bus(0x00);
+07A2  0E00     MOVLW 0x0
+07A4  ECF5     CALL 0x11EA, 0
+07A6  F008     NOP
+87:                lcd_write_bus(0x00);
+07A8  0E00     MOVLW 0x0
+07AA  ECF5     CALL 0x11EA, 0
+07AC  F008     NOP
+88:                lcd_write_bus(0x01);
+07AE  0E01     MOVLW 0x1
+07B0  ECF5     CALL 0x11EA, 0
+07B2  F008     NOP
+89:                lcd_write_bus(0x3F);
+07B4  0E3F     MOVLW 0x3F
+07B6  ECF5     CALL 0x11EA, 0
+07B8  F008     NOP
+90:            
+91:                lcd_write_command(0x2B);  // page address
+07BA  0E2B     MOVLW 0x2B
+07BC  ECEC     CALL 0x11D8, 0
+07BE  F008     NOP
+92:                lcd_write_bus(0x00);
+07C0  0E00     MOVLW 0x0
+07C2  ECF5     CALL 0x11EA, 0
+07C4  F008     NOP
+93:                lcd_write_bus(0x00);
+07C6  0E00     MOVLW 0x0
+07C8  ECF5     CALL 0x11EA, 0
+07CA  F008     NOP
+94:                lcd_write_bus(0x01);
+07CC  0E01     MOVLW 0x1
+07CE  ECF5     CALL 0x11EA, 0
+07D0  F008     NOP
+95:                lcd_write_bus(0xE0);
+07D2  0EE0     MOVLW 0xE0
+07D4  ECF5     CALL 0x11EA, 0
+07D6  F008     NOP
+96:                __delay_ms(120);
+07D8  0E0A     MOVLW 0xA
+07DA  0100     MOVLB 0x0
+07DC  6F63     MOVWF option, BANKED
+07DE  0EBE     MOVLW 0xBE
+07E0  6F62     MOVWF position, BANKED
+07E2  0E79     MOVLW 0x79
+07E4  2EE8     DECFSZ WREG, F, ACCESS
+07E6  D7FE     BRA 0x7E4
+07E8  2F62     DECFSZ position, F, BANKED
+07EA  D7FC     BRA 0x7E4
+07EC  2F63     DECFSZ option, F, BANKED
+07EE  D7FA     BRA 0x7E4
+97:                lcd_write_command(0x29);  // display on
+07F0  0E29     MOVLW 0x29
+07F2  ECEC     CALL 0x11D8, 0
+07F4  F008     NOP
+98:                
+99:                LCD_CS = 1;
+07F6  8289     BSF LATA, 1, ACCESS
+100:           }
+07F8  0012     RETURN 0
+101:           
+102:           void lcd_set_background(unsigned int color) {
+103:               LCD_CS = 0;
+0F66  9289     BCF LATA, 1, ACCESS
+104:               lcd_set_address(0,0,319,479);
+0F68  0E00     MOVLW 0x0
+0F6A  0100     MOVLB 0x0
+0F6C  6F63     MOVWF option, BANKED
+0F6E  0E00     MOVLW 0x0
+0F70  6F62     MOVWF position, BANKED
+0F72  0E00     MOVLW 0x0
+0F74  6F65     MOVWF 0x65, BANKED
+0F76  0E00     MOVLW 0x0
+0F78  6F64     MOVWF y1, BANKED
+0F7A  0E01     MOVLW 0x1
+0F7C  6F67     MOVWF 0x67, BANKED
+0F7E  0E3F     MOVLW 0x3F
+0F80  6F66     MOVWF x2, BANKED
+0F82  0E01     MOVLW 0x1
+0F84  6F69     MOVWF 0x69, BANKED
+0F86  0EDF     MOVLW 0xDF
+0F88  6F68     MOVWF y2, BANKED
+0F8A  ECEE     CALL 0xFDC, 0
+0F8C  F007     NOP
+105:               lcd_memory_start();
+0F8E  EC0F     CALL 0x121E, 0
+0F90  F009     NOP
+106:               for (unsigned int i=0;i<320;i++) {
+0F92  0E00     MOVLW 0x0
+0F94  0100     MOVLB 0x0
+0F96  6F6D     MOVWF baudRate, BANKED
+0F98  0E00     MOVLW 0x0
+0F9A  6F6C     MOVWF y, BANKED
+0F9C  D017     BRA 0xFCC
+0FC8  4B6C     INFSNZ y, F, BANKED
+0FCA  2B6D     INCF baudRate, F, BANKED
+0FCC  0E40     MOVLW 0x40
+0FCE  5D6C     SUBWF y, W, BANKED
+0FD0  0E01     MOVLW 0x1
+0FD2  596D     SUBWFB baudRate, W, BANKED
+0FD4  A0D8     BTFSS STATUS, 0, ACCESS
+0FD6  D7E3     BRA 0xF9E
+107:                   for (unsigned int j=0;j<480;j++) {
+0F9E  0E00     MOVLW 0x0
+0FA0  6F6F     MOVWF size, BANKED
+0FA2  0E00     MOVLW 0x0
+0FA4  6F6E     MOVWF c, BANKED
+0FA6  0EE0     MOVLW 0xE0
+0FA8  5D6E     SUBWF c, W, BANKED
+0FAA  0E01     MOVLW 0x1
+0FAC  596F     SUBWFB size, W, BANKED
+0FAE  B0D8     BTFSC STATUS, 0, ACCESS
+0FB0  D00B     BRA 0xFC8
+0FC0  0100     MOVLB 0x0
+0FC2  4B6E     INFSNZ c, F, BANKED
+0FC4  2B6F     INCF size, F, BANKED
+0FC6  D7EF     BRA 0xFA6
+108:                       lcd_write_bus(color >> 8);
+0FB2  516B     MOVF 0x6B, W, BANKED
+0FB4  ECF5     CALL 0x11EA, 0
+0FB6  F008     NOP
+109:                       lcd_write_bus(color);
+0FB8  0100     MOVLB 0x0
+0FBA  516A     MOVF x, W, BANKED
+0FBC  ECF5     CALL 0x11EA, 0
+0FBE  F008     NOP
+110:                   }
+111:               }
+112:               LCD_CS = 1;
+0FD8  8289     BSF LATA, 1, ACCESS
+113:           }
+0FDA  0012     RETURN 0
+114:           
+115:           void lcd_pix (unsigned int x, unsigned int y, char c, char size) {
+116:               unsigned int i;
+117:               char n1;
+118:               
+119:               x *= size;
+0B32  C06A     MOVFF x, __pcstackBANK0
+0B34  F060     NOP
+0B36  C06B     MOVFF 0x6B, cmd
+0B38  F061     NOP
+0B3A  C06F     MOVFF size, position
+0B3C  F062     NOP
+0B3E  0100     MOVLB 0x0
+0B40  6B63     CLRF option, BANKED
+0B42  ECC5     CALL 0x118A, 0
+0B44  F008     NOP
+0B46  C060     MOVFF __pcstackBANK0, x
+0B48  F06A     NOP
+0B4A  C061     MOVFF cmd, 0x6B
+0B4C  F06B     NOP
+0C36  C00B     MOVFF x, __pcstackCOMRAM
+120:               y *= size;
+0B4E  C06C     MOVFF y, __pcstackBANK0
+0B50  F060     NOP
+0B52  C06D     MOVFF baudRate, cmd
+0B54  F061     NOP
+0B56  C06F     MOVFF size, position
+0B58  F062     NOP
+0B5A  0100     MOVLB 0x0
+0B5C  6B63     CLRF option, BANKED
+0B5E  ECC5     CALL 0x118A, 0
+0B60  F008     NOP
+0B62  C060     MOVFF __pcstackBANK0, y
+0B64  F06C     NOP
+0B66  C061     MOVFF cmd, baudRate
+0B68  F06D     NOP
+0C50  C00D     MOVFF y, __pcstackCOMRAM
+0C52  F001     NOP
+0C54  C00E     MOVFF 0xE, cmd
+0C56  F002     NOP
+0C58  C010     MOVFF size, position
+0C5A  F003     NOP
+0C5C  6A04     CLRF 0x4, ACCESS
+0C5E  ECD9     CALL 0x11B2, 0
+0C60  F008     NOP
+0C62  C001     MOVFF __pcstackCOMRAM, y
+0C64  F00D     NOP
+0C66  C002     MOVFF cmd, 0xE
+0C68  F00E     NOP
+121:               n1 = size * size;
+0B6A  0100     MOVLB 0x0
+0B6C  516F     MOVF size, W, BANKED
+0B6E  036F     MULWF size, BANKED
+0B70  CFF3     MOVFF PROD, n1
+0B72  F074     NOP
+0C6A  5010     MOVF size, W, ACCESS
+0C6C  0210     MULWF size, ACCESS
+0C6E  CFF3     MOVFF PROD, lcd_pix
+0C70  F015     NOP
+122:               LCD_CS = 0;
+0B74  9289     BCF LATA, 1, ACCESS
+0C72  9289     BCF LATA, 1, ACCESS
+123:               lcd_set_address(x,y,x+size-1,y+size-1);
+0B76  C06A     MOVFF x, position
+0B78  F062     NOP
+0B7A  C06B     MOVFF 0x6B, option
+0B7C  F063     NOP
+0B7E  C06C     MOVFF y, y1
+0B80  F064     NOP
+0B82  C06D     MOVFF baudRate, 0x65
+0B84  F065     NOP
+0B86  516F     MOVF size, W, BANKED
+0B88  256A     ADDWF x, W, BANKED
+0B8A  6F70     MOVWF 0x70, BANKED
+0B8C  0E00     MOVLW 0x0
+0B8E  216B     ADDWFC 0x6B, W, BANKED
+0B90  6F71     MOVWF 0x71, BANKED
+0B92  0EFF     MOVLW 0xFF
+0B94  2570     ADDWF 0x70, W, BANKED
+0B96  6F66     MOVWF x2, BANKED
+0B98  0EFF     MOVLW 0xFF
+0B9A  2171     ADDWFC 0x71, W, BANKED
+0B9C  6F67     MOVWF 0x67, BANKED
+0B9E  516F     MOVF size, W, BANKED
+0BA0  256C     ADDWF y, W, BANKED
+0BA2  6F72     MOVWF option8, BANKED
+0BA4  0E00     MOVLW 0x0
+0BA6  216D     ADDWFC baudRate, W, BANKED
+0BA8  6F73     MOVWF option16, BANKED
+0BAA  0EFF     MOVLW 0xFF
+0BAC  2572     ADDWF option8, W, BANKED
+0BAE  6F68     MOVWF y2, BANKED
+0BB0  0EFF     MOVLW 0xFF
+0BB2  2173     ADDWFC option16, W, BANKED
+0BB4  6F69     MOVWF 0x69, BANKED
+0BB6  ECEE     CALL 0xFDC, 0
+0BB8  F007     NOP
+0C74  C00B     MOVFF x, position
+0C76  F003     NOP
+0C78  C00C     MOVFF 0xC, 0x4
+0C7A  F004     NOP
+0C7C  C00D     MOVFF y, y1
+0C7E  F005     NOP
+0C80  C00E     MOVFF 0xE, 0x6
+0C82  F006     NOP
+0C84  5010     MOVF size, W, ACCESS
+0C86  240B     ADDWF x, W, ACCESS
+0C88  6E11     MOVWF 0x11, ACCESS
+0C8A  0E00     MOVLW 0x0
+0C8C  200C     ADDWFC 0xC, W, ACCESS
+0C8E  6E12     MOVWF 0x12, ACCESS
+0C90  0EFF     MOVLW 0xFF
+0C92  2411     ADDWF 0x11, W, ACCESS
+0C94  6E07     MOVWF x2, ACCESS
+0C96  0EFF     MOVLW 0xFF
+0C98  2012     ADDWFC 0x12, W, ACCESS
+0C9A  6E08     MOVWF 0x8, ACCESS
+0C9C  5010     MOVF size, W, ACCESS
+0C9E  240D     ADDWF y, W, ACCESS
+0CA0  6E13     MOVWF 0x13, ACCESS
+0CA2  0E00     MOVLW 0x0
+0CA4  200E     ADDWFC 0xE, W, ACCESS
+0CA6  6E14     MOVWF 0x14, ACCESS
+0CA8  0EFF     MOVLW 0xFF
+0CAA  2413     ADDWF 0x13, W, ACCESS
+0CAC  6E09     MOVWF y2, ACCESS
+0CAE  0EFF     MOVLW 0xFF
+0CB0  2014     ADDWFC 0x14, W, ACCESS
+0CB2  6E0A     MOVWF 0xA, ACCESS
+0CB4  EC78     CALL 0x10F0, 0
+0CB6  F008     NOP
+124:               lcd_memory_start();
+0BBA  EC0F     CALL 0x121E, 0
+0BBC  F009     NOP
+0CB8  EC13     CALL 0x1226, 0
+0CBA  F009     NOP
+125:           
+126:               switch (c) {
+0BBE  D031     BRA 0xC22
+0C22  0100     MOVLB 0x0
+0C24  516E     MOVF c, W, BANKED
+0C26  0A00     XORLW 0x0
+0C28  B4D8     BTFSC STATUS, 2, ACCESS
+0C2A  D7E3     BRA 0xBF2
+0C2C  0A01     XORLW 0x1
+0C2E  B4D8     BTFSC STATUS, 2, ACCESS
+0C30  D7C7     BRA 0xBC0
+0CBC  D02E     BRA 0xD1A
+0D1A  500F     MOVF c, W, ACCESS
+0D1C  0A00     XORLW 0x0
+0D1E  B4D8     BTFSC STATUS, 2, ACCESS
+0D20  D7E5     BRA 0xCEC
+0D22  0A01     XORLW 0x1
+0D24  B4D8     BTFSC STATUS, 2, ACCESS
+0D26  D7CB     BRA 0xCBE
+127:                   case 1:
+128:                       for(i=0;i<n1;i++) {
+0BC0  0E00     MOVLW 0x0
+0BC2  0100     MOVLB 0x0
+0BC4  6F76     MOVWF 0x76, BANKED
+0BC6  0E00     MOVLW 0x0
+0BC8  6F75     MOVWF i, BANKED
+0BCA  D009     BRA 0xBDE
+0BD8  0100     MOVLB 0x0
+0BDA  4B75     INFSNZ i, F, BANKED
+0BDC  2B76     INCF 0x76, F, BANKED
+0BDE  5174     MOVF n1, W, BANKED
+0BE0  6F70     MOVWF 0x70, BANKED
+0BE2  6B71     CLRF 0x71, BANKED
+0BE4  5170     MOVF 0x70, W, BANKED
+0BE6  5D75     SUBWF i, W, BANKED
+0BE8  5171     MOVF 0x71, W, BANKED
+0BEA  5976     SUBWFB 0x76, W, BANKED
+0BEC  B0D8     BTFSC STATUS, 0, ACCESS
+0BEE  D021     BRA 0xC32
+0BF0  D7ED     BRA 0xBCC
+0CBE  0E00     MOVLW 0x0
+0CC0  6E17     MOVWF 0x17, ACCESS
+0CC2  0E00     MOVLW 0x0
+0CC4  6E16     MOVWF lcd_pix, ACCESS
+0CC6  D008     BRA 0xCD8
+0CD4  4A16     INFSNZ lcd_pix, F, ACCESS
+0CD6  2A17     INCF 0x17, F, ACCESS
+0CD8  5015     MOVF lcd_pix, W, ACCESS
+0CDA  6E11     MOVWF 0x11, ACCESS
+0CDC  6A12     CLRF 0x12, ACCESS
+0CDE  5011     MOVF 0x11, W, ACCESS
+0CE0  5C16     SUBWF lcd_pix, W, ACCESS
+0CE2  5012     MOVF 0x12, W, ACCESS
+0CE4  5817     SUBWFB 0x17, W, ACCESS
+0CE6  B0D8     BTFSC STATUS, 0, ACCESS
+0CE8  D01F     BRA 0xD28
+0CEA  D7EE     BRA 0xCC8
+129:                           lcd_write_bus(0x00);
+0BCC  0E00     MOVLW 0x0
+0BCE  ECF5     CALL 0x11EA, 0
+0BD0  F008     NOP
+0CC8  0E00     MOVLW 0x0
+0CCA  EC09     CALL 0x1212, 0
+0CCC  F009     NOP
+130:                           lcd_write_bus(0x00);
+0BD2  0E00     MOVLW 0x0
+0BD4  ECF5     CALL 0x11EA, 0
+0BD6  F008     NOP
+0CCE  0E00     MOVLW 0x0
+0CD0  EC09     CALL 0x1212, 0
+0CD2  F009     NOP
+131:                       }
+132:                       break;
+133:                   case 0:
+134:                       for(i=0;i<n1;i++) {
+0BF2  0E00     MOVLW 0x0
+0BF4  6F76     MOVWF 0x76, BANKED
+0BF6  0E00     MOVLW 0x0
+0BF8  6F75     MOVWF i, BANKED
+0BFA  D009     BRA 0xC0E
+0C08  0100     MOVLB 0x0
+0C0A  4B75     INFSNZ i, F, BANKED
+0C0C  2B76     INCF 0x76, F, BANKED
+0C0E  5174     MOVF n1, W, BANKED
+0C10  6F70     MOVWF 0x70, BANKED
+0C12  6B71     CLRF 0x71, BANKED
+0C14  5170     MOVF 0x70, W, BANKED
+0C16  5D75     SUBWF i, W, BANKED
+0C18  5171     MOVF 0x71, W, BANKED
+0C1A  5976     SUBWFB 0x76, W, BANKED
+0C1C  B0D8     BTFSC STATUS, 0, ACCESS
+0C1E  D009     BRA 0xC32
+0C20  D7ED     BRA 0xBFC
+0CEC  0E00     MOVLW 0x0
+0CEE  6E17     MOVWF 0x17, ACCESS
+0CF0  0E00     MOVLW 0x0
+0CF2  6E16     MOVWF lcd_pix, ACCESS
+0CF4  D008     BRA 0xD06
+0D02  4A16     INFSNZ lcd_pix, F, ACCESS
+0D04  2A17     INCF 0x17, F, ACCESS
+0D06  5015     MOVF lcd_pix, W, ACCESS
+0D08  6E11     MOVWF 0x11, ACCESS
+0D0A  6A12     CLRF 0x12, ACCESS
+0D0C  5011     MOVF 0x11, W, ACCESS
+0D0E  5C16     SUBWF lcd_pix, W, ACCESS
+0D10  5012     MOVF 0x12, W, ACCESS
+0D12  5817     SUBWFB 0x17, W, ACCESS
+0D14  B0D8     BTFSC STATUS, 0, ACCESS
+0D16  D008     BRA 0xD28
+0D18  D7EE     BRA 0xCF6
+135:                           lcd_write_bus(0xFF);
+0BFC  0EFF     MOVLW 0xFF
+0BFE  ECF5     CALL 0x11EA, 0
+0C00  F008     NOP
+0CF6  0EFF     MOVLW 0xFF
+0CF8  EC09     CALL 0x1212, 0
+0CFA  F009     NOP
+136:                           lcd_write_bus(0xFF);
+0C02  0EFF     MOVLW 0xFF
+0C04  ECF5     CALL 0x11EA, 0
+0C06  F008     NOP
+0CFC  0EFF     MOVLW 0xFF
+0CFE  EC09     CALL 0x1212, 0
+0D00  F009     NOP
+137:                       }
+138:                       break;
+139:               }
+140:           
+141:               LCD_CS = 1;
+0C32  8289     BSF LATA, 1, ACCESS
+0D28  8289     BSF LATA, 1, ACCESS
+142:           }
+0C34  0012     RETURN 0
+0D2A  0012     RETURN 0
+143:           
+144:           void lcd_pix_color (unsigned int x, unsigned int y, char c, char size) {
+145:               unsigned int i;
+146:               char n1;
+147:               
+148:               x *= size;
+0A2E  C06A     MOVFF x, __pcstackBANK0
+0A30  F060     NOP
+0A32  C06B     MOVFF 0x6B, cmd
+0A34  F061     NOP
+0A36  C06F     MOVFF size, position
+0A38  F062     NOP
+0A3A  0100     MOVLB 0x0
+0A3C  6B63     CLRF option, BANKED
+0A3E  ECC5     CALL 0x118A, 0
+0A40  F008     NOP
+0A42  C060     MOVFF __pcstackBANK0, x
+0A44  F06A     NOP
+0A46  C061     MOVFF cmd, 0x6B
+0A48  F06B     NOP
+149:               y *= size;
+0A4A  C06C     MOVFF y, __pcstackBANK0
+0A4C  F060     NOP
+0A4E  C06D     MOVFF baudRate, cmd
+0A50  F061     NOP
+0A52  C06F     MOVFF size, position
+0A54  F062     NOP
+0A56  0100     MOVLB 0x0
+0A58  6B63     CLRF option, BANKED
+0A5A  ECC5     CALL 0x118A, 0
+0A5C  F008     NOP
+0A5E  C060     MOVFF __pcstackBANK0, y
+0A60  F06C     NOP
+0A62  C061     MOVFF cmd, baudRate
+0A64  F06D     NOP
+150:               n1 = size * size;
+0A66  0100     MOVLB 0x0
+0A68  516F     MOVF size, W, BANKED
+0A6A  036F     MULWF size, BANKED
+0A6C  CFF3     MOVFF PROD, n1
+0A6E  F074     NOP
+151:               LCD_CS = 0;
+0A70  9289     BCF LATA, 1, ACCESS
+152:               lcd_set_address(x,y,x+size-1,y+size-1);
+0A72  C06A     MOVFF x, position
+0A74  F062     NOP
+0A76  C06B     MOVFF 0x6B, option
+0A78  F063     NOP
+0A7A  C06C     MOVFF y, y1
+0A7C  F064     NOP
+0A7E  C06D     MOVFF baudRate, 0x65
+0A80  F065     NOP
+0A82  516F     MOVF size, W, BANKED
+0A84  256A     ADDWF x, W, BANKED
+0A86  6F70     MOVWF 0x70, BANKED
+0A88  0E00     MOVLW 0x0
+0A8A  216B     ADDWFC 0x6B, W, BANKED
+0A8C  6F71     MOVWF 0x71, BANKED
+0A8E  0EFF     MOVLW 0xFF
+0A90  2570     ADDWF 0x70, W, BANKED
+0A92  6F66     MOVWF x2, BANKED
+0A94  0EFF     MOVLW 0xFF
+0A96  2171     ADDWFC 0x71, W, BANKED
+0A98  6F67     MOVWF 0x67, BANKED
+0A9A  516F     MOVF size, W, BANKED
+0A9C  256C     ADDWF y, W, BANKED
+0A9E  6F72     MOVWF option8, BANKED
+0AA0  0E00     MOVLW 0x0
+0AA2  216D     ADDWFC baudRate, W, BANKED
+0AA4  6F73     MOVWF option16, BANKED
+0AA6  0EFF     MOVLW 0xFF
+0AA8  2572     ADDWF option8, W, BANKED
+0AAA  6F68     MOVWF y2, BANKED
+0AAC  0EFF     MOVLW 0xFF
+0AAE  2173     ADDWFC option16, W, BANKED
+0AB0  6F69     MOVWF 0x69, BANKED
+0AB2  ECEE     CALL 0xFDC, 0
+0AB4  F007     NOP
+153:               lcd_memory_start();
+0AB6  EC0F     CALL 0x121E, 0
+0AB8  F009     NOP
+154:           
+155:               switch (c) {
+0ABA  D031     BRA 0xB1E
+0B1E  0100     MOVLB 0x0
+0B20  516E     MOVF c, W, BANKED
+0B22  0A00     XORLW 0x0
+0B24  B4D8     BTFSC STATUS, 2, ACCESS
+0B26  D7E3     BRA 0xAEE
+0B28  0A01     XORLW 0x1
+0B2A  B4D8     BTFSC STATUS, 2, ACCESS
+0B2C  D7C7     BRA 0xABC
+156:                   case 1:
+157:                       for(i=0;i<n1;i++) {
+0ABC  0E00     MOVLW 0x0
+0ABE  0100     MOVLB 0x0
+0AC0  6F76     MOVWF 0x76, BANKED
+0AC2  0E00     MOVLW 0x0
+0AC4  6F75     MOVWF i, BANKED
+0AC6  D009     BRA 0xADA
+0AD4  0100     MOVLB 0x0
+0AD6  4B75     INFSNZ i, F, BANKED
+0AD8  2B76     INCF 0x76, F, BANKED
+0ADA  5174     MOVF n1, W, BANKED
+0ADC  6F70     MOVWF 0x70, BANKED
+0ADE  6B71     CLRF 0x71, BANKED
+0AE0  5170     MOVF 0x70, W, BANKED
+0AE2  5D75     SUBWF i, W, BANKED
+0AE4  5171     MOVF 0x71, W, BANKED
+0AE6  5976     SUBWFB 0x76, W, BANKED
+0AE8  B0D8     BTFSC STATUS, 0, ACCESS
+0AEA  D021     BRA 0xB2E
+0AEC  D7ED     BRA 0xAC8
+158:                           lcd_write_bus(0xF8);
+0AC8  0EF8     MOVLW 0xF8
+0ACA  ECF5     CALL 0x11EA, 0
+0ACC  F008     NOP
+159:                           lcd_write_bus(0x00);
+0ACE  0E00     MOVLW 0x0
+0AD0  ECF5     CALL 0x11EA, 0
+0AD2  F008     NOP
+160:                       }
+161:                       break;
+162:                   case 0:
+163:                       for(i=0;i<n1;i++) {
+0AEE  0E00     MOVLW 0x0
+0AF0  6F76     MOVWF 0x76, BANKED
+0AF2  0E00     MOVLW 0x0
+0AF4  6F75     MOVWF i, BANKED
+0AF6  D009     BRA 0xB0A
+0B04  0100     MOVLB 0x0
+0B06  4B75     INFSNZ i, F, BANKED
+0B08  2B76     INCF 0x76, F, BANKED
+0B0A  5174     MOVF n1, W, BANKED
+0B0C  6F70     MOVWF 0x70, BANKED
+0B0E  6B71     CLRF 0x71, BANKED
+0B10  5170     MOVF 0x70, W, BANKED
+0B12  5D75     SUBWF i, W, BANKED
+0B14  5171     MOVF 0x71, W, BANKED
+0B16  5976     SUBWFB 0x76, W, BANKED
+0B18  B0D8     BTFSC STATUS, 0, ACCESS
+0B1A  D009     BRA 0xB2E
+0B1C  D7ED     BRA 0xAF8
+164:                           lcd_write_bus(0xFF);
+0AF8  0EFF     MOVLW 0xFF
+0AFA  ECF5     CALL 0x11EA, 0
+0AFC  F008     NOP
+165:                           lcd_write_bus(0xFF);
+0AFE  0EFF     MOVLW 0xFF
+0B00  ECF5     CALL 0x11EA, 0
+0B02  F008     NOP
+166:                       }
+167:                       break;
+168:               }
+169:           
+170:               LCD_CS = 1;
+0B2E  8289     BSF LATA, 1, ACCESS
+171:           }
+0B30  0012     RETURN 0
+172:           
+173:           void lcd_sign (char enable) {
+07FA  6E18     MOVWF enable, ACCESS
+174:               lcd_pix(50,1,enable,5);
+07FC  0E00     MOVLW 0x0
+07FE  6E0C     MOVWF 0xC, ACCESS
+0800  0E32     MOVLW 0x32
+0802  6E0B     MOVWF x, ACCESS
+0804  0E00     MOVLW 0x0
+0806  6E0E     MOVWF 0xE, ACCESS
+0808  0E01     MOVLW 0x1
+080A  6E0D     MOVWF y, ACCESS
+080C  C018     MOVFF enable, c
+080E  F00F     NOP
+0810  0E05     MOVLW 0x5
+0812  6E10     MOVWF size, ACCESS
+0814  EC1B     CALL 0xC36, 0
+0816  F006     NOP
+175:               lcd_pix(50,2,enable,5);
+0818  0E00     MOVLW 0x0
+081A  6E0C     MOVWF 0xC, ACCESS
+081C  0E32     MOVLW 0x32
+081E  6E0B     MOVWF x, ACCESS
+0820  0E00     MOVLW 0x0
+0822  6E0E     MOVWF 0xE, ACCESS
+0824  0E02     MOVLW 0x2
+0826  6E0D     MOVWF y, ACCESS
+0828  C018     MOVFF enable, c
+082A  F00F     NOP
+082C  0E05     MOVLW 0x5
+082E  6E10     MOVWF size, ACCESS
+0830  EC1B     CALL 0xC36, 0
+0832  F006     NOP
+176:               lcd_pix(50,3,enable,5);
+0834  0E00     MOVLW 0x0
+0836  6E0C     MOVWF 0xC, ACCESS
+0838  0E32     MOVLW 0x32
+083A  6E0B     MOVWF x, ACCESS
+083C  0E00     MOVLW 0x0
+083E  6E0E     MOVWF 0xE, ACCESS
+0840  0E03     MOVLW 0x3
+0842  6E0D     MOVWF y, ACCESS
+0844  C018     MOVFF enable, c
+0846  F00F     NOP
+0848  0E05     MOVLW 0x5
+084A  6E10     MOVWF size, ACCESS
+084C  EC1B     CALL 0xC36, 0
+084E  F006     NOP
+177:               lcd_pix(50,4,enable,5);
+0850  0E00     MOVLW 0x0
+0852  6E0C     MOVWF 0xC, ACCESS
+0854  0E32     MOVLW 0x32
+0856  6E0B     MOVWF x, ACCESS
+0858  0E00     MOVLW 0x0
+085A  6E0E     MOVWF 0xE, ACCESS
+085C  0E04     MOVLW 0x4
+085E  6E0D     MOVWF y, ACCESS
+0860  C018     MOVFF enable, c
+0862  F00F     NOP
+0864  0E05     MOVLW 0x5
+0866  6E10     MOVWF size, ACCESS
+0868  EC1B     CALL 0xC36, 0
+086A  F006     NOP
+178:               lcd_pix(50,5,enable,5);
+086C  0E00     MOVLW 0x0
+086E  6E0C     MOVWF 0xC, ACCESS
+0870  0E32     MOVLW 0x32
+0872  6E0B     MOVWF x, ACCESS
+0874  0E00     MOVLW 0x0
+0876  6E0E     MOVWF 0xE, ACCESS
+0878  0E05     MOVLW 0x5
+087A  6E0D     MOVWF y, ACCESS
+087C  C018     MOVFF enable, c
+087E  F00F     NOP
+0880  0E05     MOVLW 0x5
+0882  6E10     MOVWF size, ACCESS
+0884  EC1B     CALL 0xC36, 0
+0886  F006     NOP
+179:               lcd_pix(49,1,enable,5);
+0888  0E00     MOVLW 0x0
+088A  6E0C     MOVWF 0xC, ACCESS
+088C  0E31     MOVLW 0x31
+088E  6E0B     MOVWF x, ACCESS
+0890  0E00     MOVLW 0x0
+0892  6E0E     MOVWF 0xE, ACCESS
+0894  0E01     MOVLW 0x1
+0896  6E0D     MOVWF y, ACCESS
+0898  C018     MOVFF enable, c
+089A  F00F     NOP
+089C  0E05     MOVLW 0x5
+089E  6E10     MOVWF size, ACCESS
+08A0  EC1B     CALL 0xC36, 0
+08A2  F006     NOP
+180:               lcd_pix(49,2,enable,5);
+08A4  0E00     MOVLW 0x0
+08A6  6E0C     MOVWF 0xC, ACCESS
+08A8  0E31     MOVLW 0x31
+08AA  6E0B     MOVWF x, ACCESS
+08AC  0E00     MOVLW 0x0
+08AE  6E0E     MOVWF 0xE, ACCESS
+08B0  0E02     MOVLW 0x2
+08B2  6E0D     MOVWF y, ACCESS
+08B4  C018     MOVFF enable, c
+08B6  F00F     NOP
+08B8  0E05     MOVLW 0x5
+08BA  6E10     MOVWF size, ACCESS
+08BC  EC1B     CALL 0xC36, 0
+08BE  F006     NOP
+181:               lcd_pix(49,3,enable,5);
+08C0  0E00     MOVLW 0x0
+08C2  6E0C     MOVWF 0xC, ACCESS
+08C4  0E31     MOVLW 0x31
+08C6  6E0B     MOVWF x, ACCESS
+08C8  0E00     MOVLW 0x0
+08CA  6E0E     MOVWF 0xE, ACCESS
+08CC  0E03     MOVLW 0x3
+08CE  6E0D     MOVWF y, ACCESS
+08D0  C018     MOVFF enable, c
+08D2  F00F     NOP
+08D4  0E05     MOVLW 0x5
+08D6  6E10     MOVWF size, ACCESS
+08D8  EC1B     CALL 0xC36, 0
+08DA  F006     NOP
+182:               lcd_pix(49,4,enable,5);
+08DC  0E00     MOVLW 0x0
+08DE  6E0C     MOVWF 0xC, ACCESS
+08E0  0E31     MOVLW 0x31
+08E2  6E0B     MOVWF x, ACCESS
+08E4  0E00     MOVLW 0x0
+08E6  6E0E     MOVWF 0xE, ACCESS
+08E8  0E04     MOVLW 0x4
+08EA  6E0D     MOVWF y, ACCESS
+08EC  C018     MOVFF enable, c
+08EE  F00F     NOP
+08F0  0E05     MOVLW 0x5
+08F2  6E10     MOVWF size, ACCESS
+08F4  EC1B     CALL 0xC36, 0
+08F6  F006     NOP
+183:               lcd_pix(49,5,enable,5);
+08F8  0E00     MOVLW 0x0
+08FA  6E0C     MOVWF 0xC, ACCESS
+08FC  0E31     MOVLW 0x31
+08FE  6E0B     MOVWF x, ACCESS
+0900  0E00     MOVLW 0x0
+0902  6E0E     MOVWF 0xE, ACCESS
+0904  0E05     MOVLW 0x5
+0906  6E0D     MOVWF y, ACCESS
+0908  C018     MOVFF enable, c
+090A  F00F     NOP
+090C  0E05     MOVLW 0x5
+090E  6E10     MOVWF size, ACCESS
+0910  EC1B     CALL 0xC36, 0
+0912  F006     NOP
+184:           }
+0914  0012     RETURN 0
+185:           
+186:           void lcd_point(char place) {
+0D2C  0100     MOVLB 0x0
+0D2E  6F77     MOVWF msjPtr, BANKED
+187:               lcd_pix(62,96 - 18 * place,1,5);
+0D30  0E00     MOVLW 0x0
+0D32  0100     MOVLB 0x0
+0D34  6F6B     MOVWF 0x6B, BANKED
+0D36  0E3E     MOVLW 0x3E
+0D38  6F6A     MOVWF x, BANKED
+0D3A  5177     MOVF msjPtr, W, BANKED
+0D3C  0D12     MULLW 0x12
+0D3E  1EF3     COMF PROD, F, ACCESS
+0D40  1EF4     COMF PRODH, F, ACCESS
+0D42  4AF3     INFSNZ PROD, F, ACCESS
+0D44  2AF4     INCF PRODH, F, ACCESS
+0D46  0E60     MOVLW 0x60
+0D48  24F3     ADDWF PROD, W, ACCESS
+0D4A  6F6C     MOVWF y, BANKED
+0D4C  0E00     MOVLW 0x0
+0D4E  20F4     ADDWFC PRODH, W, ACCESS
+0D50  6F6D     MOVWF baudRate, BANKED
+0D52  0E01     MOVLW 0x1
+0D54  6F6E     MOVWF c, BANKED
+0D56  0E05     MOVLW 0x5
+0D58  6F6F     MOVWF size, BANKED
+0D5A  EC99     CALL 0xB32, 0
+0D5C  F005     NOP
+188:               lcd_pix(61,96 - 18 * place,1,5);
+0D5E  0E00     MOVLW 0x0
+0D60  0100     MOVLB 0x0
+0D62  6F6B     MOVWF 0x6B, BANKED
+0D64  0E3D     MOVLW 0x3D
+0D66  6F6A     MOVWF x, BANKED
+0D68  5177     MOVF msjPtr, W, BANKED
+0D6A  0D12     MULLW 0x12
+0D6C  1EF3     COMF PROD, F, ACCESS
+0D6E  1EF4     COMF PRODH, F, ACCESS
+0D70  4AF3     INFSNZ PROD, F, ACCESS
+0D72  2AF4     INCF PRODH, F, ACCESS
+0D74  0E60     MOVLW 0x60
+0D76  24F3     ADDWF PROD, W, ACCESS
+0D78  6F6C     MOVWF y, BANKED
+0D7A  0E00     MOVLW 0x0
+0D7C  20F4     ADDWFC PRODH, W, ACCESS
+0D7E  6F6D     MOVWF baudRate, BANKED
+0D80  0E01     MOVLW 0x1
+0D82  6F6E     MOVWF c, BANKED
+0D84  0E05     MOVLW 0x5
+0D86  6F6F     MOVWF size, BANKED
+0D88  EC99     CALL 0xB32, 0
+0D8A  F005     NOP
+189:               lcd_pix(62,97 - 18 * place,1,5);
+0D8C  0E00     MOVLW 0x0
+0D8E  0100     MOVLB 0x0
+0D90  6F6B     MOVWF 0x6B, BANKED
+0D92  0E3E     MOVLW 0x3E
+0D94  6F6A     MOVWF x, BANKED
+0D96  5177     MOVF msjPtr, W, BANKED
+0D98  0D12     MULLW 0x12
+0D9A  1EF3     COMF PROD, F, ACCESS
+0D9C  1EF4     COMF PRODH, F, ACCESS
+0D9E  4AF3     INFSNZ PROD, F, ACCESS
+0DA0  2AF4     INCF PRODH, F, ACCESS
+0DA2  0E61     MOVLW 0x61
+0DA4  24F3     ADDWF PROD, W, ACCESS
+0DA6  6F6C     MOVWF y, BANKED
+0DA8  0E00     MOVLW 0x0
+0DAA  20F4     ADDWFC PRODH, W, ACCESS
+0DAC  6F6D     MOVWF baudRate, BANKED
+0DAE  0E01     MOVLW 0x1
+0DB0  6F6E     MOVWF c, BANKED
+0DB2  0E05     MOVLW 0x5
+0DB4  6F6F     MOVWF size, BANKED
+0DB6  EC99     CALL 0xB32, 0
+0DB8  F005     NOP
+190:               lcd_pix(61,97 - 18 * place,1,5);
+0DBA  0E00     MOVLW 0x0
+0DBC  0100     MOVLB 0x0
+0DBE  6F6B     MOVWF 0x6B, BANKED
+0DC0  0E3D     MOVLW 0x3D
+0DC2  6F6A     MOVWF x, BANKED
+0DC4  5177     MOVF msjPtr, W, BANKED
+0DC6  0D12     MULLW 0x12
+0DC8  1EF3     COMF PROD, F, ACCESS
+0DCA  1EF4     COMF PRODH, F, ACCESS
+0DCC  4AF3     INFSNZ PROD, F, ACCESS
+0DCE  2AF4     INCF PRODH, F, ACCESS
+0DD0  0E61     MOVLW 0x61
+0DD2  24F3     ADDWF PROD, W, ACCESS
+0DD4  6F6C     MOVWF y, BANKED
+0DD6  0E00     MOVLW 0x0
+0DD8  20F4     ADDWFC PRODH, W, ACCESS
+0DDA  6F6D     MOVWF baudRate, BANKED
+0DDC  0E01     MOVLW 0x1
+0DDE  6F6E     MOVWF c, BANKED
+0DE0  0E05     MOVLW 0x5
+0DE2  6F6F     MOVWF size, BANKED
+0DE4  EC99     CALL 0xB32, 0
+0DE6  F005     NOP
+191:           }
+0DE8  0012     RETURN 0
+192:           
+193:           void lcd_number(signed int number) {
+194:               char i,j,k,index[5] = {10,0,0,0,0};
+050C  EE20     LFSR 2, 0x55
+050E  F055     NOP
+0510  EE10     LFSR 1, 0x20
+0512  F020     NOP
+0514  0E04     MOVLW 0x4
+0516  CFDB     MOVFF PLUSW2, PLUSW1
+0518  FFE3     NOP
+051A  06E8     DECF WREG, F, ACCESS
+051C  E2FC     BC 0x516
+195:           
+196:               if (number<0) {  // compute the sign
+051E  AE1A     BTFSS 0x1A, 7, ACCESS
+0520  D008     BRA 0x532
+197:                   lcd_sign(1);
+0522  0E01     MOVLW 0x1
+0524  ECFD     CALL 0x7FA, 0
+0526  F003     NOP
+198:                   number = 0 - number;
+0528  6C19     NEGF number, ACCESS
+052A  1E1A     COMF 0x1A, F, ACCESS
+052C  B0D8     BTFSC STATUS, 0, ACCESS
+052E  2A1A     INCF 0x1A, F, ACCESS
+199:               } else {
+0530  D003     BRA 0x538
+200:                   lcd_sign(0);
+0532  0E00     MOVLW 0x0
+0534  ECFD     CALL 0x7FA, 0
+0536  F003     NOP
+201:               }
+202:               if (number > 9999) {
+0538  BE1A     BTFSC 0x1A, 7, ACCESS
+053A  D00E     BRA 0x558
+053C  0E10     MOVLW 0x10
+053E  5C19     SUBWF number, W, ACCESS
+0540  0E27     MOVLW 0x27
+0542  581A     SUBWFB 0x1A, W, ACCESS
+0544  A0D8     BTFSS STATUS, 0, ACCESS
+0546  D008     BRA 0x558
+203:                   index[0] = 0;
+0548  0E00     MOVLW 0x0
+054A  6E20     MOVWF index, ACCESS
+204:               }
+205:               while (number > 9999) {
+054C  D005     BRA 0x558
+206:                   index[0] += 1;
+054E  2A20     INCF index, F, ACCESS
+207:                   number -= 10000;
+0550  0EF0     MOVLW 0xF0
+0552  2619     ADDWF number, F, ACCESS
+0554  0ED8     MOVLW 0xD8
+0556  221A     ADDWFC 0x1A, F, ACCESS
+208:               }
+0558  BE1A     BTFSC 0x1A, 7, ACCESS
+055A  D00C     BRA 0x574
+055C  0E10     MOVLW 0x10
+055E  5C19     SUBWF number, W, ACCESS
+0560  0E27     MOVLW 0x27
+0562  581A     SUBWFB 0x1A, W, ACCESS
+0564  A0D8     BTFSS STATUS, 0, ACCESS
+0566  D006     BRA 0x574
+0568  D7F2     BRA 0x54E
+209:               while (number > 999) {
+210:                   index[1] += 1;
+056A  2A21     INCF 0x21, F, ACCESS
+211:                   number -= 1000;
+056C  0E18     MOVLW 0x18
+056E  2619     ADDWF number, F, ACCESS
+0570  0EFC     MOVLW 0xFC
+0572  221A     ADDWFC 0x1A, F, ACCESS
+212:               }
+0574  BE1A     BTFSC 0x1A, 7, ACCESS
+0576  D006     BRA 0x584
+0578  0EE8     MOVLW 0xE8
+057A  5C19     SUBWF number, W, ACCESS
+057C  0E03     MOVLW 0x3
+057E  581A     SUBWFB 0x1A, W, ACCESS
+0580  B0D8     BTFSC STATUS, 0, ACCESS
+0582  D7F3     BRA 0x56A
+213:               if (index[0] == 10 && index[1] == 0) {
+0584  0E0A     MOVLW 0xA
+0586  1820     XORWF index, W, ACCESS
+0588  A4D8     BTFSS STATUS, 2, ACCESS
+058A  D00B     BRA 0x5A2
+058C  5021     MOVF 0x21, W, ACCESS
+058E  A4D8     BTFSS STATUS, 2, ACCESS
+0590  D008     BRA 0x5A2
+214:                   index[1] = 10;
+0592  0E0A     MOVLW 0xA
+0594  6E21     MOVWF 0x21, ACCESS
+215:               }
+216:               while (number > 99) {
+0596  D005     BRA 0x5A2
+217:                   index[2] += 1;
+0598  2A22     INCF 0x22, F, ACCESS
+218:                   number -= 100;
+059A  0E9C     MOVLW 0x9C
+059C  2619     ADDWF number, F, ACCESS
+059E  0EFF     MOVLW 0xFF
+05A0  221A     ADDWFC 0x1A, F, ACCESS
+219:               }
+05A2  BE1A     BTFSC 0x1A, 7, ACCESS
+05A4  D006     BRA 0x5B2
+05A6  501A     MOVF 0x1A, W, ACCESS
+05A8  E1F7     BNZ 0x598
+05AA  0E64     MOVLW 0x64
+05AC  5C19     SUBWF number, W, ACCESS
+05AE  B0D8     BTFSC STATUS, 0, ACCESS
+05B0  D7F3     BRA 0x598
+220:               if (index[1] == 10 && index[2] == 0) {
+05B2  0E0A     MOVLW 0xA
+05B4  1821     XORWF 0x21, W, ACCESS
+05B6  A4D8     BTFSS STATUS, 2, ACCESS
+05B8  D00B     BRA 0x5D0
+05BA  5022     MOVF 0x22, W, ACCESS
+05BC  A4D8     BTFSS STATUS, 2, ACCESS
+05BE  D008     BRA 0x5D0
+221:                   index[2] = 10;
+05C0  0E0A     MOVLW 0xA
+05C2  6E22     MOVWF 0x22, ACCESS
+222:               }
+223:               while (number > 9) {
+05C4  D005     BRA 0x5D0
+224:                   index[3] += 1;
+05C6  2A23     INCF 0x23, F, ACCESS
+225:                   number -= 10;
+05C8  0EF6     MOVLW 0xF6
+05CA  2619     ADDWF number, F, ACCESS
+05CC  0EFF     MOVLW 0xFF
+05CE  221A     ADDWFC 0x1A, F, ACCESS
+226:               }
+05D0  BE1A     BTFSC 0x1A, 7, ACCESS
+05D2  D006     BRA 0x5E0
+05D4  501A     MOVF 0x1A, W, ACCESS
+05D6  E1F7     BNZ 0x5C6
+05D8  0E0A     MOVLW 0xA
+05DA  5C19     SUBWF number, W, ACCESS
+05DC  B0D8     BTFSC STATUS, 0, ACCESS
+05DE  D7F3     BRA 0x5C6
+227:               index[4] = number;
+05E0  C019     MOVFF number, 0x24
+05E2  F024     NOP
+228:           
+229:               for (k=0;k<5;k++) {
+05E4  0E00     MOVLW 0x0
+05E6  6E27     MOVWF k, ACCESS
+05E8  0E04     MOVLW 0x4
+05EA  6427     CPFSGT k, ACCESS
+05EC  D001     BRA 0x5F0
+05EE  0012     RETURN 0
+06A4  2A27     INCF k, F, ACCESS
+06A6  D7A0     BRA 0x5E8
+230:                   for (i=0;i<22;i++) {
+05F0  0E00     MOVLW 0x0
+05F2  6E25     MOVWF i, ACCESS
+05F4  0E15     MOVLW 0x15
+05F6  6425     CPFSGT i, ACCESS
+05F8  D001     BRA 0x5FC
+05FA  D054     BRA 0x6A4
+06A0  2A25     INCF i, F, ACCESS
+06A2  D7A8     BRA 0x5F4
+231:                       for (j=0;j<16;j++) {
+05FC  0E00     MOVLW 0x0
+05FE  6E26     MOVWF j, ACCESS
+0600  0E0F     MOVLW 0xF
+0602  6426     CPFSGT j, ACCESS
+0604  D001     BRA 0x608
+0606  D04C     BRA 0x6A0
+069C  2A26     INCF j, F, ACCESS
+069E  D7B0     BRA 0x600
+232:                           lcd_pix(40+i,(18*k+8)+j,bitRead(digitos[index[k]][i],15-j),5);
+0608  0E28     MOVLW 0x28
+060A  2425     ADDWF i, W, ACCESS
+060C  6E0B     MOVWF x, ACCESS
+060E  6A0C     CLRF 0xC, ACCESS
+0610  0E00     MOVLW 0x0
+0612  220C     ADDWFC 0xC, F, ACCESS
+0614  5027     MOVF k, W, ACCESS
+0616  0D12     MULLW 0x12
+0618  5026     MOVF j, W, ACCESS
+061A  26F3     ADDWF PROD, F, ACCESS
+061C  0E00     MOVLW 0x0
+061E  22F4     ADDWFC PRODH, F, ACCESS
+0620  0E08     MOVLW 0x8
+0622  24F3     ADDWF PROD, W, ACCESS
+0624  6E0D     MOVWF y, ACCESS
+0626  0E00     MOVLW 0x0
+0628  20F4     ADDWFC PRODH, W, ACCESS
+062A  6E0E     MOVWF 0xE, ACCESS
+062C  5027     MOVF k, W, ACCESS
+062E  0D01     MULLW 0x1
+0630  0E20     MOVLW 0x20
+0632  24F3     ADDWF PROD, W, ACCESS
+0634  6ED9     MOVWF FSR2, ACCESS
+0636  0E00     MOVLW 0x0
+0638  20F4     ADDWFC PRODH, W, ACCESS
+063A  6EDA     MOVWF FSR2H, ACCESS
+063C  50DF     MOVF INDF2, W, ACCESS
+063E  6E1B     MOVWF 0x1B, ACCESS
+0640  501B     MOVF 0x1B, W, ACCESS
+0642  0D2C     MULLW 0x2C
+0644  0E93     MOVLW 0x93
+0646  6E1C     MOVWF 0x1C, ACCESS
+0648  0EFC     MOVLW 0xFC
+064A  6E1D     MOVWF 0x1D, ACCESS
+064C  50F3     MOVF PROD, W, ACCESS
+064E  261C     ADDWF 0x1C, F, ACCESS
+0650  50F4     MOVF PRODH, W, ACCESS
+0652  221D     ADDWFC 0x1D, F, ACCESS
+0654  5025     MOVF i, W, ACCESS
+0656  0D02     MULLW 0x2
+0658  50F3     MOVF PROD, W, ACCESS
+065A  261C     ADDWF 0x1C, F, ACCESS
+065C  50F4     MOVF PRODH, W, ACCESS
+065E  221D     ADDWFC 0x1D, F, ACCESS
+0660  C01C     MOVFF 0x1C, TBLPTR
+0662  FFF6     NOP
+0664  C01D     MOVFF 0x1D, TBLPTRH
+0666  FFF7     NOP
+0668  0009     TBLRD*+
+066A  CFF5     MOVFF TABLAT, __pcstackCOMRAM
+066C  F001     NOP
+066E  000A     TBLRD*-
+0670  CFF5     MOVFF TABLAT, cmd
+0672  F002     NOP
+0674  5026     MOVF j, W, ACCESS
+0676  6E1E     MOVWF 0x1E, ACCESS
+0678  6A1F     CLRF 0x1F, ACCESS
+067A  1E1E     COMF 0x1E, F, ACCESS
+067C  1E1F     COMF 0x1F, F, ACCESS
+067E  4A1E     INFSNZ 0x1E, F, ACCESS
+0680  2A1F     INCF 0x1F, F, ACCESS
+0682  0E0F     MOVLW 0xF
+0684  241E     ADDWF 0x1E, W, ACCESS
+0686  6E03     MOVWF position, ACCESS
+0688  0E00     MOVLW 0x0
+068A  201F     ADDWFC 0x1F, W, ACCESS
+068C  6E04     MOVWF 0x4, ACCESS
+068E  EC59     CALL 0x10B2, 0
+0690  F008     NOP
+0692  6E0F     MOVWF c, ACCESS
+0694  0E05     MOVLW 0x5
+0696  6E10     MOVWF size, ACCESS
+0698  EC1B     CALL 0xC36, 0
+069A  F006     NOP
+069C  2A26     INCF j, F, ACCESS
+069E  D7B0     BRA 0x600
+06A0  2A25     INCF i, F, ACCESS
+06A2  D7A8     BRA 0x5F4
+06A4  2A27     INCF k, F, ACCESS
+06A6  D7A0     BRA 0x5E8
+233:                       }
+234:                   }
+235:               }
+236:           }
+237:           
+238:           void lcd_text (char renglon, char *msjPtr) {
+0364  0100     MOVLB 0x0
+0366  6F80     MOVWF renglon, BANKED
+239:               unsigned int i,j,k;
+240:           
+241:               for (k=0;k<15;k++) {
+0368  0E00     MOVLW 0x0
+036A  0100     MOVLB 0x0
+036C  6F86     MOVWF 0x86, BANKED
+036E  0E00     MOVLW 0x0
+0370  6F85     MOVWF k, BANKED
+0372  5186     MOVF 0x86, W, BANKED
+0374  E105     BNZ 0x380
+0376  0E0F     MOVLW 0xF
+0378  5D85     SUBWF k, W, BANKED
+037A  B0D8     BTFSC STATUS, 0, ACCESS
+037C  0012     RETURN 0
+037E  D001     BRA 0x382
+0380  0012     RETURN 0
+0500  4B85     INFSNZ k, F, BANKED
+0502  2B86     INCF 0x86, F, BANKED
+0504  5186     MOVF 0x86, W, BANKED
+0506  E101     BNZ 0x50A
+0508  D736     BRA 0x376
+242:                   if (*(msjPtr+k) == 32 || *(msjPtr+k) == 0) {
+0382  5185     MOVF k, W, BANKED
+0384  2577     ADDWF msjPtr, W, BANKED
+0386  6ED9     MOVWF FSR2, ACCESS
+0388  5186     MOVF 0x86, W, BANKED
+038A  2178     ADDWFC 0x78, W, BANKED
+038C  6EDA     MOVWF FSR2H, ACCESS
+038E  0E20     MOVLW 0x20
+0390  18DE     XORWF POSTINC2, W, ACCESS
+0392  B4D8     BTFSC STATUS, 2, ACCESS
+0394  D009     BRA 0x3A8
+0396  5185     MOVF k, W, BANKED
+0398  2577     ADDWF msjPtr, W, BANKED
+039A  6ED9     MOVWF FSR2, ACCESS
+039C  5186     MOVF 0x86, W, BANKED
+039E  2178     ADDWFC 0x78, W, BANKED
+03A0  6EDA     MOVWF FSR2H, ACCESS
+03A2  50DF     MOVF INDF2, W, ACCESS
+03A4  A4D8     BTFSS STATUS, 2, ACCESS
+03A6  D008     BRA 0x3B8
+243:                       *(msjPtr+k) = 38;
+03A8  5185     MOVF k, W, BANKED
+03AA  2577     ADDWF msjPtr, W, BANKED
+03AC  6ED9     MOVWF FSR2, ACCESS
+03AE  5186     MOVF 0x86, W, BANKED
+03B0  2178     ADDWFC 0x78, W, BANKED
+03B2  6EDA     MOVWF FSR2H, ACCESS
+03B4  0E26     MOVLW 0x26
+03B6  6EDF     MOVWF INDF2, ACCESS
+244:                   }
+245:                   if (*(msjPtr+k) > 47 && *(msjPtr+k) < 58) {
+03B8  5185     MOVF k, W, BANKED
+03BA  2577     ADDWF msjPtr, W, BANKED
+03BC  6ED9     MOVWF FSR2, ACCESS
+03BE  5186     MOVF 0x86, W, BANKED
+03C0  2178     ADDWFC 0x78, W, BANKED
+03C2  6EDA     MOVWF FSR2H, ACCESS
+03C4  0E2F     MOVLW 0x2F
+03C6  64DF     CPFSGT INDF2, ACCESS
+03C8  D011     BRA 0x3EC
+03CA  5185     MOVF k, W, BANKED
+03CC  2577     ADDWF msjPtr, W, BANKED
+03CE  6ED9     MOVWF FSR2, ACCESS
+03D0  5186     MOVF 0x86, W, BANKED
+03D2  2178     ADDWFC 0x78, W, BANKED
+03D4  6EDA     MOVWF FSR2H, ACCESS
+03D6  0E3A     MOVLW 0x3A
+03D8  60DF     CPFSLT INDF2, ACCESS
+03DA  D008     BRA 0x3EC
+246:                       *(msjPtr+k) -= 48;
+03DC  5185     MOVF k, W, BANKED
+03DE  2577     ADDWF msjPtr, W, BANKED
+03E0  6ED9     MOVWF FSR2, ACCESS
+03E2  5186     MOVF 0x86, W, BANKED
+03E4  2178     ADDWFC 0x78, W, BANKED
+03E6  6EDA     MOVWF FSR2H, ACCESS
+03E8  0E30     MOVLW 0x30
+03EA  5EDF     SUBWF INDF2, F, ACCESS
+247:                   }
+248:                   if (*(msjPtr+k) > 64) {
+03EC  5185     MOVF k, W, BANKED
+03EE  2577     ADDWF msjPtr, W, BANKED
+03F0  6ED9     MOVWF FSR2, ACCESS
+03F2  5186     MOVF 0x86, W, BANKED
+03F4  2178     ADDWFC 0x78, W, BANKED
+03F6  6EDA     MOVWF FSR2H, ACCESS
+03F8  0E40     MOVLW 0x40
+03FA  64DF     CPFSGT INDF2, ACCESS
+03FC  D008     BRA 0x40E
+249:                       *(msjPtr+k) -= 53;
+03FE  5185     MOVF k, W, BANKED
+0400  2577     ADDWF msjPtr, W, BANKED
+0402  6ED9     MOVWF FSR2, ACCESS
+0404  5186     MOVF 0x86, W, BANKED
+0406  2178     ADDWFC 0x78, W, BANKED
+0408  6EDA     MOVWF FSR2H, ACCESS
+040A  0E35     MOVLW 0x35
+040C  5EDF     SUBWF INDF2, F, ACCESS
+250:                   }
+251:                   
+252:                   for (i=0;i<8;i++) {
+040E  0E00     MOVLW 0x0
+0410  6F82     MOVWF 0x82, BANKED
+0412  0E00     MOVLW 0x0
+0414  6F81     MOVWF i, BANKED
+0416  5182     MOVF 0x82, W, BANKED
+0418  E173     BNZ 0x500
+041A  0E08     MOVLW 0x8
+041C  5D81     SUBWF i, W, BANKED
+041E  B0D8     BTFSC STATUS, 0, ACCESS
+0420  D06F     BRA 0x500
+04F6  4B81     INFSNZ i, F, BANKED
+04F8  2B82     INCF 0x82, F, BANKED
+04FA  5182     MOVF 0x82, W, BANKED
+04FC  E101     BNZ 0x500
+04FE  D78D     BRA 0x41A
+253:                       for (j=0;j<8;j++) {
+0422  0E00     MOVLW 0x0
+0424  6F84     MOVWF 0x84, BANKED
+0426  0E00     MOVLW 0x0
+0428  6F83     MOVWF j, BANKED
+042A  5184     MOVF 0x84, W, BANKED
+042C  E164     BNZ 0x4F6
+042E  0E08     MOVLW 0x8
+0430  5D83     SUBWF j, W, BANKED
+0432  B0D8     BTFSC STATUS, 0, ACCESS
+0434  D060     BRA 0x4F6
+04EE  0100     MOVLB 0x0
+04F0  4B83     INFSNZ j, F, BANKED
+04F2  2B84     INCF 0x84, F, BANKED
+04F4  D79A     BRA 0x42A
+254:                           lcd_pix(1+j+(renglon-1)*9,1+i+k*8,bitRead(texto[*(msjPtr+k)][i],j),4);
+0436  0EFF     MOVLW 0xFF
+0438  2580     ADDWF renglon, W, BANKED
+043A  6F60     MOVWF __pcstackBANK0, BANKED
+043C  6B61     CLRF cmd, BANKED
+043E  0EFF     MOVLW 0xFF
+0440  2361     ADDWFC cmd, F, BANKED
+0442  0E00     MOVLW 0x0
+0444  6F63     MOVWF option, BANKED
+0446  0E09     MOVLW 0x9
+0448  6F62     MOVWF position, BANKED
+044A  ECC5     CALL 0x118A, 0
+044C  F008     NOP
+044E  0100     MOVLB 0x0
+0450  5183     MOVF j, W, BANKED
+0452  2760     ADDWF __pcstackBANK0, F, BANKED
+0454  5184     MOVF 0x84, W, BANKED
+0456  2361     ADDWFC cmd, F, BANKED
+0458  0E01     MOVLW 0x1
+045A  2560     ADDWF __pcstackBANK0, W, BANKED
+045C  6F7E     MOVWF 0x7E, BANKED
+045E  0E00     MOVLW 0x0
+0460  2161     ADDWFC cmd, W, BANKED
+0462  6F7F     MOVWF 0x7F, BANKED
+0464  C07E     MOVFF 0x7E, x
+0466  F06A     NOP
+0468  C07F     MOVFF 0x7F, 0x6B
+046A  F06B     NOP
+046C  C085     MOVFF k, 0x79
+046E  F079     NOP
+0470  C086     MOVFF 0x86, 0x7A
+0472  F07A     NOP
+0474  90D8     BCF STATUS, 0, ACCESS
+0476  3779     RLCF 0x79, F, BANKED
+0478  377A     RLCF 0x7A, F, BANKED
+047A  90D8     BCF STATUS, 0, ACCESS
+047C  3779     RLCF 0x79, F, BANKED
+047E  377A     RLCF 0x7A, F, BANKED
+0480  90D8     BCF STATUS, 0, ACCESS
+0482  3779     RLCF 0x79, F, BANKED
+0484  377A     RLCF 0x7A, F, BANKED
+0486  5181     MOVF i, W, BANKED
+0488  2779     ADDWF 0x79, F, BANKED
+048A  5182     MOVF 0x82, W, BANKED
+048C  237A     ADDWFC 0x7A, F, BANKED
+048E  0E01     MOVLW 0x1
+0490  2579     ADDWF 0x79, W, BANKED
+0492  6F6C     MOVWF y, BANKED
+0494  0E00     MOVLW 0x0
+0496  217A     ADDWFC 0x7A, W, BANKED
+0498  6F6D     MOVWF baudRate, BANKED
+049A  5185     MOVF k, W, BANKED
+049C  2577     ADDWF msjPtr, W, BANKED
+049E  6ED9     MOVWF FSR2, ACCESS
+04A0  5186     MOVF 0x86, W, BANKED
+04A2  2178     ADDWFC 0x78, W, BANKED
+04A4  6EDA     MOVWF FSR2H, ACCESS
+04A6  50DF     MOVF INDF2, W, ACCESS
+04A8  6F7B     MOVWF 0x7B, BANKED
+04AA  517B     MOVF 0x7B, W, BANKED
+04AC  0D08     MULLW 0x8
+04AE  0E77     MOVLW 0x77
+04B0  6F7C     MOVWF 0x7C, BANKED
+04B2  0EFE     MOVLW 0xFE
+04B4  6F7D     MOVWF 0x7D, BANKED
+04B6  50F3     MOVF PROD, W, ACCESS
+04B8  277C     ADDWF 0x7C, F, BANKED
+04BA  50F4     MOVF PRODH, W, ACCESS
+04BC  237D     ADDWFC 0x7D, F, BANKED
+04BE  5181     MOVF i, W, BANKED
+04C0  277C     ADDWF 0x7C, F, BANKED
+04C2  5182     MOVF 0x82, W, BANKED
+04C4  237D     ADDWFC 0x7D, F, BANKED
+04C6  C07C     MOVFF 0x7C, TBLPTR
+04C8  FFF6     NOP
+04CA  C07D     MOVFF 0x7D, TBLPTRH
+04CC  FFF7     NOP
+04CE  0008     TBLRD*
+04D0  50F5     MOVF TABLAT, W, ACCESS
+04D2  6F60     MOVWF __pcstackBANK0, BANKED
+04D4  6B61     CLRF cmd, BANKED
+04D6  C083     MOVFF j, position
+04D8  F062     NOP
+04DA  C084     MOVFF 0x84, option
+04DC  F063     NOP
+04DE  EC38     CALL 0x1070, 0
+04E0  F008     NOP
+04E2  0100     MOVLB 0x0
+04E4  6F6E     MOVWF c, BANKED
+04E6  0E04     MOVLW 0x4
+04E8  6F6F     MOVWF size, BANKED
+04EA  EC99     CALL 0xB32, 0
+04EC  F005     NOP
+255:                       }
+256:                   }
+257:               }
+258:           }
+050A  0012     RETURN 0
+259:           
+260:           void lcd_text_color (char renglon, char *msjPtr) {
+01BC  0100     MOVLB 0x0
+01BE  6F80     MOVWF renglon, BANKED
+261:               unsigned int i,j,k;
+262:           
+263:               for (k=0;k<15;k++) {
+01C0  0E00     MOVLW 0x0
+01C2  0100     MOVLB 0x0
+01C4  6F86     MOVWF 0x86, BANKED
+01C6  0E00     MOVLW 0x0
+01C8  6F85     MOVWF k, BANKED
+01CA  5186     MOVF 0x86, W, BANKED
+01CC  E105     BNZ 0x1D8
+01CE  0E0F     MOVLW 0xF
+01D0  5D85     SUBWF k, W, BANKED
+01D2  B0D8     BTFSC STATUS, 0, ACCESS
+01D4  0012     RETURN 0
+01D6  D001     BRA 0x1DA
+01D8  0012     RETURN 0
+0358  4B85     INFSNZ k, F, BANKED
+035A  2B86     INCF 0x86, F, BANKED
+035C  5186     MOVF 0x86, W, BANKED
+035E  E101     BNZ 0x362
+0360  D736     BRA 0x1CE
+264:                   if (*(msjPtr+k) == 32 || *(msjPtr+k) == 0) {
+01DA  5185     MOVF k, W, BANKED
+01DC  2577     ADDWF msjPtr, W, BANKED
+01DE  6ED9     MOVWF FSR2, ACCESS
+01E0  5186     MOVF 0x86, W, BANKED
+01E2  2178     ADDWFC 0x78, W, BANKED
+01E4  6EDA     MOVWF FSR2H, ACCESS
+01E6  0E20     MOVLW 0x20
+01E8  18DE     XORWF POSTINC2, W, ACCESS
+01EA  B4D8     BTFSC STATUS, 2, ACCESS
+01EC  D009     BRA 0x200
+01EE  5185     MOVF k, W, BANKED
+01F0  2577     ADDWF msjPtr, W, BANKED
+01F2  6ED9     MOVWF FSR2, ACCESS
+01F4  5186     MOVF 0x86, W, BANKED
+01F6  2178     ADDWFC 0x78, W, BANKED
+01F8  6EDA     MOVWF FSR2H, ACCESS
+01FA  50DF     MOVF INDF2, W, ACCESS
+01FC  A4D8     BTFSS STATUS, 2, ACCESS
+01FE  D008     BRA 0x210
+265:                       *(msjPtr+k) = 38;
+0200  5185     MOVF k, W, BANKED
+0202  2577     ADDWF msjPtr, W, BANKED
+0204  6ED9     MOVWF FSR2, ACCESS
+0206  5186     MOVF 0x86, W, BANKED
+0208  2178     ADDWFC 0x78, W, BANKED
+020A  6EDA     MOVWF FSR2H, ACCESS
+020C  0E26     MOVLW 0x26
+020E  6EDF     MOVWF INDF2, ACCESS
+266:                   }
+267:                   if (*(msjPtr+k) > 47 && *(msjPtr+k) < 58) {
+0210  5185     MOVF k, W, BANKED
+0212  2577     ADDWF msjPtr, W, BANKED
+0214  6ED9     MOVWF FSR2, ACCESS
+0216  5186     MOVF 0x86, W, BANKED
+0218  2178     ADDWFC 0x78, W, BANKED
+021A  6EDA     MOVWF FSR2H, ACCESS
+021C  0E2F     MOVLW 0x2F
+021E  64DF     CPFSGT INDF2, ACCESS
+0220  D011     BRA 0x244
+0222  5185     MOVF k, W, BANKED
+0224  2577     ADDWF msjPtr, W, BANKED
+0226  6ED9     MOVWF FSR2, ACCESS
+0228  5186     MOVF 0x86, W, BANKED
+022A  2178     ADDWFC 0x78, W, BANKED
+022C  6EDA     MOVWF FSR2H, ACCESS
+022E  0E3A     MOVLW 0x3A
+0230  60DF     CPFSLT INDF2, ACCESS
+0232  D008     BRA 0x244
+268:                       *(msjPtr+k) -= 48;
+0234  5185     MOVF k, W, BANKED
+0236  2577     ADDWF msjPtr, W, BANKED
+0238  6ED9     MOVWF FSR2, ACCESS
+023A  5186     MOVF 0x86, W, BANKED
+023C  2178     ADDWFC 0x78, W, BANKED
+023E  6EDA     MOVWF FSR2H, ACCESS
+0240  0E30     MOVLW 0x30
+0242  5EDF     SUBWF INDF2, F, ACCESS
+269:                   }
+270:                   if (*(msjPtr+k) > 64) {
+0244  5185     MOVF k, W, BANKED
+0246  2577     ADDWF msjPtr, W, BANKED
+0248  6ED9     MOVWF FSR2, ACCESS
+024A  5186     MOVF 0x86, W, BANKED
+024C  2178     ADDWFC 0x78, W, BANKED
+024E  6EDA     MOVWF FSR2H, ACCESS
+0250  0E40     MOVLW 0x40
+0252  64DF     CPFSGT INDF2, ACCESS
+0254  D008     BRA 0x266
+271:                       *(msjPtr+k) -= 53;
+0256  5185     MOVF k, W, BANKED
+0258  2577     ADDWF msjPtr, W, BANKED
+025A  6ED9     MOVWF FSR2, ACCESS
+025C  5186     MOVF 0x86, W, BANKED
+025E  2178     ADDWFC 0x78, W, BANKED
+0260  6EDA     MOVWF FSR2H, ACCESS
+0262  0E35     MOVLW 0x35
+0264  5EDF     SUBWF INDF2, F, ACCESS
+272:                   }
+273:                   
+274:                   for (i=0;i<8;i++) {
+0266  0E00     MOVLW 0x0
+0268  6F82     MOVWF 0x82, BANKED
+026A  0E00     MOVLW 0x0
+026C  6F81     MOVWF i, BANKED
+026E  5182     MOVF 0x82, W, BANKED
+0270  E173     BNZ 0x358
+0272  0E08     MOVLW 0x8
+0274  5D81     SUBWF i, W, BANKED
+0276  B0D8     BTFSC STATUS, 0, ACCESS
+0278  D06F     BRA 0x358
+034E  4B81     INFSNZ i, F, BANKED
+0350  2B82     INCF 0x82, F, BANKED
+0352  5182     MOVF 0x82, W, BANKED
+0354  E101     BNZ 0x358
+0356  D78D     BRA 0x272
+275:                       for (j=0;j<8;j++) {
+027A  0E00     MOVLW 0x0
+027C  6F84     MOVWF 0x84, BANKED
+027E  0E00     MOVLW 0x0
+0280  6F83     MOVWF j, BANKED
+0282  5184     MOVF 0x84, W, BANKED
+0284  E164     BNZ 0x34E
+0286  0E08     MOVLW 0x8
+0288  5D83     SUBWF j, W, BANKED
+028A  B0D8     BTFSC STATUS, 0, ACCESS
+028C  D060     BRA 0x34E
+0346  0100     MOVLB 0x0
+0348  4B83     INFSNZ j, F, BANKED
+034A  2B84     INCF 0x84, F, BANKED
+034C  D79A     BRA 0x282
+276:                           lcd_pix_color(1+j+(renglon-1)*9,1+i+k*8,bitRead(texto[*(msjPtr+k)][i],j),4);
+028E  0EFF     MOVLW 0xFF
+0290  2580     ADDWF renglon, W, BANKED
+0292  6F60     MOVWF __pcstackBANK0, BANKED
+0294  6B61     CLRF cmd, BANKED
+0296  0EFF     MOVLW 0xFF
+0298  2361     ADDWFC cmd, F, BANKED
+029A  0E00     MOVLW 0x0
+029C  6F63     MOVWF option, BANKED
+029E  0E09     MOVLW 0x9
+02A0  6F62     MOVWF position, BANKED
+02A2  ECC5     CALL 0x118A, 0
+02A4  F008     NOP
+02A6  0100     MOVLB 0x0
+02A8  5183     MOVF j, W, BANKED
+02AA  2760     ADDWF __pcstackBANK0, F, BANKED
+02AC  5184     MOVF 0x84, W, BANKED
+02AE  2361     ADDWFC cmd, F, BANKED
+02B0  0E01     MOVLW 0x1
+02B2  2560     ADDWF __pcstackBANK0, W, BANKED
+02B4  6F7E     MOVWF 0x7E, BANKED
+02B6  0E00     MOVLW 0x0
+02B8  2161     ADDWFC cmd, W, BANKED
+02BA  6F7F     MOVWF 0x7F, BANKED
+02BC  C07E     MOVFF 0x7E, x
+02BE  F06A     NOP
+02C0  C07F     MOVFF 0x7F, 0x6B
+02C2  F06B     NOP
+02C4  C085     MOVFF k, 0x79
+02C6  F079     NOP
+02C8  C086     MOVFF 0x86, 0x7A
+02CA  F07A     NOP
+02CC  90D8     BCF STATUS, 0, ACCESS
+02CE  3779     RLCF 0x79, F, BANKED
+02D0  377A     RLCF 0x7A, F, BANKED
+02D2  90D8     BCF STATUS, 0, ACCESS
+02D4  3779     RLCF 0x79, F, BANKED
+02D6  377A     RLCF 0x7A, F, BANKED
+02D8  90D8     BCF STATUS, 0, ACCESS
+02DA  3779     RLCF 0x79, F, BANKED
+02DC  377A     RLCF 0x7A, F, BANKED
+02DE  5181     MOVF i, W, BANKED
+02E0  2779     ADDWF 0x79, F, BANKED
+02E2  5182     MOVF 0x82, W, BANKED
+02E4  237A     ADDWFC 0x7A, F, BANKED
+02E6  0E01     MOVLW 0x1
+02E8  2579     ADDWF 0x79, W, BANKED
+02EA  6F6C     MOVWF y, BANKED
+02EC  0E00     MOVLW 0x0
+02EE  217A     ADDWFC 0x7A, W, BANKED
+02F0  6F6D     MOVWF baudRate, BANKED
+02F2  5185     MOVF k, W, BANKED
+02F4  2577     ADDWF msjPtr, W, BANKED
+02F6  6ED9     MOVWF FSR2, ACCESS
+02F8  5186     MOVF 0x86, W, BANKED
+02FA  2178     ADDWFC 0x78, W, BANKED
+02FC  6EDA     MOVWF FSR2H, ACCESS
+02FE  50DF     MOVF INDF2, W, ACCESS
+0300  6F7B     MOVWF 0x7B, BANKED
+0302  517B     MOVF 0x7B, W, BANKED
+0304  0D08     MULLW 0x8
+0306  0E77     MOVLW 0x77
+0308  6F7C     MOVWF 0x7C, BANKED
+030A  0EFE     MOVLW 0xFE
+030C  6F7D     MOVWF 0x7D, BANKED
+030E  50F3     MOVF PROD, W, ACCESS
+0310  277C     ADDWF 0x7C, F, BANKED
+0312  50F4     MOVF PRODH, W, ACCESS
+0314  237D     ADDWFC 0x7D, F, BANKED
+0316  5181     MOVF i, W, BANKED
+0318  277C     ADDWF 0x7C, F, BANKED
+031A  5182     MOVF 0x82, W, BANKED
+031C  237D     ADDWFC 0x7D, F, BANKED
+031E  C07C     MOVFF 0x7C, TBLPTR
+0320  FFF6     NOP
+0322  C07D     MOVFF 0x7D, TBLPTRH
+0324  FFF7     NOP
+0326  0008     TBLRD*
+0328  50F5     MOVF TABLAT, W, ACCESS
+032A  6F60     MOVWF __pcstackBANK0, BANKED
+032C  6B61     CLRF cmd, BANKED
+032E  C083     MOVFF j, position
+0330  F062     NOP
+0332  C084     MOVFF 0x84, option
+0334  F063     NOP
+0336  EC38     CALL 0x1070, 0
+0338  F008     NOP
+033A  0100     MOVLB 0x0
+033C  6F6E     MOVWF c, BANKED
+033E  0E04     MOVLW 0x4
+0340  6F6F     MOVWF size, BANKED
+0342  EC17     CALL 0xA2E, 0
+0344  F005     NOP
+277:                       }
+278:                   }
+279:               }
+280:           }
+0362  0012     RETURN 0
+---  C:/Users/hsaintandre/Desktop/archivos/programacion/firmware/cabezal/hmi.X/hmiMain.c  ---------------
+1:             /*
+2:              * File:   hmiMain.c
+3:              * Author: hsaintandre
+4:              *
+5:              * Created on 6 de noviembre de 2018, 12:06
+6:              */
+7:             
+8:             
+9:             #include <xc.h>
+10:            #include "configs.h"
+11:            #include "definitions.h"
+12:            #include <stdio.h>
+13:            #include <string.h>
+14:            #include "tft.h"
+15:            
+16:            /* UART variables */
+17:            volatile char buff1[15], k1 = 0;
+18:            volatile char buff2[15], k2 = 0;
+19:            
+20:            /* LCD variables */
+21:            char lcdText[16];
+22:            
+23:            /* TIMER variables */
+24:            unsigned int divisor = 0;
+25:            
+26:            /* Global variables */
+27:            signed int globalVar1 = 0;
+28:            
+29:            void putch (char data) {
+1206  6E01     MOVWF __pcstackCOMRAM, ACCESS
+30:                while(!PIR3bits.TX2IF)
+1208  A8A4     BTFSS PIR3, 4, ACCESS
+120A  D7FE     BRA 0x1208
+31:                    continue;
+32:                TXREG2 = data;
+120C  C001     MOVFF __pcstackCOMRAM, TXREG2
+120E  FF79     NOP
+33:            }
+1210  0012     RETURN 0
+34:            
+35:            void timer2_config(char pre, char post, char eoc) {
+1160  0100     MOVLB 0x0
+1162  6F62     MOVWF position, BANKED
+36:                char option = 0;
+1164  0E00     MOVLW 0x0
+1166  0100     MOVLB 0x0
+1168  6F63     MOVWF option, BANKED
+37:                
+38:                option = post - 1;
+116A  0560     DECF __pcstackBANK0, W, BANKED
+116C  6F63     MOVWF option, BANKED
+39:                option = option << 3;
+116E  3963     SWAPF option, W, BANKED
+1170  42E8     RRNCF WREG, F, ACCESS
+1172  0BF8     ANDLW 0xF8
+1174  6F63     MOVWF option, BANKED
+40:                T2CON = option;
+1176  C063     MOVFF option, T2CON
+1178  FFCA     NOP
+41:                T2CON += pre;
+117A  5162     MOVF position, W, BANKED
+117C  26CA     ADDWF T2CON, F, ACCESS
+42:                PR2 = eoc;
+117E  C061     MOVFF cmd, PR2
+1180  FFCB     NOP
+43:                PIE1bits.TMR2IE = 1;
+1182  829D     BSF PIE1, 1, ACCESS
+44:                PIR1bits.TMR2IF = 0;
+1184  929E     BCF PIR1, 1, ACCESS
+45:                T2CONbits.TMR2ON = 1;
+1186  84CA     BSF T2CON, 2, ACCESS
+46:            }
+1188  0012     RETURN 0
+47:            
+48:            void uart1_config(unsigned long baudRate) {
+49:                unsigned int option16;
+50:                char option8;
+51:                
+52:                baudRate *= 4;
+0EEA  0100     MOVLB 0x0
+0EEC  0E02     MOVLW 0x2
+0EEE  90D8     BCF STATUS, 0, ACCESS
+0EF0  376D     RLCF baudRate, F, BANKED
+0EF2  376E     RLCF c, F, BANKED
+0EF4  376F     RLCF size, F, BANKED
+0EF6  3770     RLCF 0x70, F, BANKED
+0EF8  2EE8     DECFSZ WREG, F, ACCESS
+0EFA  D7F9     BRA 0xEEE
+53:                option16 = _XTAL_FREQ / baudRate;
+0EFC  0E00     MOVLW 0x0
+0EFE  6F60     MOVWF __pcstackBANK0, BANKED
+0F00  0E90     MOVLW 0x90
+0F02  6F61     MOVWF cmd, BANKED
+0F04  0ED0     MOVLW 0xD0
+0F06  6F62     MOVWF position, BANKED
+0F08  0E03     MOVLW 0x3
+0F0A  6F63     MOVWF option, BANKED
+0F0C  C06D     MOVFF baudRate, y1
+0F0E  F064     NOP
+0F10  C06E     MOVFF c, 0x65
+0F12  F065     NOP
+0F14  C06F     MOVFF size, x2
+0F16  F066     NOP
+0F18  C070     MOVFF 0x70, 0x67
+0F1A  F067     NOP
+0F1C  ECF5     CALL 0xDEA, 0
+0F1E  F006     NOP
+0F20  C060     MOVFF __pcstackBANK0, option16
+0F22  F073     NOP
+0F24  C061     MOVFF cmd, n1
+0F26  F074     NOP
+54:                option8 = option16 & 0x00FF;
+0F28  C073     MOVFF option16, option8
+0F2A  F072     NOP
+55:                SPBRG1 = option8;
+0F2C  C072     MOVFF option8, SPBRG1
+0F2E  FFAF     NOP
+56:                option16 = option16 >> 8;
+0F30  0100     MOVLB 0x0
+0F32  5174     MOVF n1, W, BANKED
+0F34  6F73     MOVWF option16, BANKED
+0F36  6B74     CLRF n1, BANKED
+57:                option8 = option16 & 0x00FF;
+0F38  C073     MOVFF option16, option8
+0F3A  F072     NOP
+58:                SPBRGH1 = option8;
+0F3C  C072     MOVFF option8, SPBRGH1
+0F3E  FF7D     NOP
+59:                
+60:                TXSTA1 = 0b00100100;
+0F40  0E24     MOVLW 0x24
+0F42  6EAC     MOVWF TXSTA1, ACCESS
+61:                RCSTA1 = 0b10010000;
+0F44  0E90     MOVLW 0x90
+0F46  6EAB     MOVWF RCSTA1, ACCESS
+62:                BAUDCON1bits.BRG16 = 1;
+0F48  86A7     BSF BAUDCON1, 3, ACCESS
+63:                
+64:                PIE1bits.TX1IE = 0;
+0F4A  989D     BCF PIE1, 4, ACCESS
+65:                PIR1bits.TX1IF = 0;
+0F4C  989E     BCF PIR1, 4, ACCESS
+66:                PIE1bits.RC1IE = 1;
+0F4E  8A9D     BSF PIE1, 5, ACCESS
+67:                PIR1bits.RC1IF = 0;
+0F50  9A9E     BCF PIR1, 5, ACCESS
+68:                __delay_ms(1);
+0F52  0E15     MOVLW 0x15
+0F54  0100     MOVLB 0x0
+0F56  6F71     MOVWF 0x71, BANKED
+0F58  0EC6     MOVLW 0xC6
+0F5A  2EE8     DECFSZ WREG, F, ACCESS
+0F5C  D7FE     BRA 0xF5A
+0F5E  2F71     DECFSZ 0x71, F, BANKED
+0F60  D7FC     BRA 0xF5A
+0F62  F000     NOP
+69:            }
+0F64  0012     RETURN 0
+70:            
+71:            void uart2_config(unsigned long baudRate) {
+72:                unsigned int option16;
+73:                char option8;
+74:                
+75:                baudRate *= 4;
+0E6E  0100     MOVLB 0x0
+0E70  0E02     MOVLW 0x2
+0E72  90D8     BCF STATUS, 0, ACCESS
+0E74  376D     RLCF baudRate, F, BANKED
+0E76  376E     RLCF c, F, BANKED
+0E78  376F     RLCF size, F, BANKED
+0E7A  3770     RLCF 0x70, F, BANKED
+0E7C  2EE8     DECFSZ WREG, F, ACCESS
+0E7E  D7F9     BRA 0xE72
+76:                option16 = _XTAL_FREQ / baudRate;
+0E80  0E00     MOVLW 0x0
+0E82  6F60     MOVWF __pcstackBANK0, BANKED
+0E84  0E90     MOVLW 0x90
+0E86  6F61     MOVWF cmd, BANKED
+0E88  0ED0     MOVLW 0xD0
+0E8A  6F62     MOVWF position, BANKED
+0E8C  0E03     MOVLW 0x3
+0E8E  6F63     MOVWF option, BANKED
+0E90  C06D     MOVFF baudRate, y1
+0E92  F064     NOP
+0E94  C06E     MOVFF c, 0x65
+0E96  F065     NOP
+0E98  C06F     MOVFF size, x2
+0E9A  F066     NOP
+0E9C  C070     MOVFF 0x70, 0x67
+0E9E  F067     NOP
+0EA0  ECF5     CALL 0xDEA, 0
+0EA2  F006     NOP
+0EA4  C060     MOVFF __pcstackBANK0, option16
+0EA6  F073     NOP
+0EA8  C061     MOVFF cmd, n1
+0EAA  F074     NOP
+77:                option8 = option16 & 0x00FF;
+0EAC  C073     MOVFF option16, option8
+0EAE  F072     NOP
+78:                SPBRG2 = option8;
+0EB0  C072     MOVFF option8, SPBRG2
+0EB2  FF7B     NOP
+79:                option16 = option16 >> 8;
+0EB4  0100     MOVLB 0x0
+0EB6  5174     MOVF n1, W, BANKED
+0EB8  6F73     MOVWF option16, BANKED
+0EBA  6B74     CLRF n1, BANKED
+80:                option8 = option16 & 0x00FF;
+0EBC  C073     MOVFF option16, option8
+0EBE  F072     NOP
+81:                SPBRGH2 = option8;
+0EC0  C072     MOVFF option8, SPBRGH2
+0EC2  FF7C     NOP
+82:                
+83:                TXSTA2 = 0b00100100;
+0EC4  0E24     MOVLW 0x24
+0EC6  6EBA     MOVWF TXSTA2, ACCESS
+84:                RCSTA2 = 0b10010000;
+0EC8  0E90     MOVLW 0x90
+0ECA  6EA6     MOVWF RCSTA2, ACCESS
+85:                BAUDCON2bits.BRG16 = 1;
+0ECC  86B9     BSF BAUDCON2, 3, ACCESS
+86:                
+87:                PIE3bits.TX2IE = 0;
+0ECE  98A3     BCF PIE3, 4, ACCESS
+88:                PIR3bits.TX2IF = 0;
+0ED0  98A4     BCF PIR3, 4, ACCESS
+89:                PIE3bits.RC2IE = 1;
+0ED2  8AA3     BSF PIE3, 5, ACCESS
+90:                PIR3bits.RC2IF = 0;
+0ED4  9AA4     BCF PIR3, 5, ACCESS
+91:                __delay_ms(1);
+0ED6  0E15     MOVLW 0x15
+0ED8  0100     MOVLB 0x0
+0EDA  6F71     MOVWF 0x71, BANKED
+0EDC  0EC6     MOVLW 0xC6
+0EDE  2EE8     DECFSZ WREG, F, ACCESS
+0EE0  D7FE     BRA 0xEDE
+0EE2  2F71     DECFSZ 0x71, F, BANKED
+0EE4  D7FC     BRA 0xEDE
+0EE6  F000     NOP
+92:            }
+0EE8  0012     RETURN 0
+93:            
+94:            void interrupt isr () {
+0008  825A     BSF btemp, 1, ACCESS
+95:                if (PIR1bits.TMR2IF) {
+0052  A29E     BTFSS PIR1, 1, ACCESS
+0054  D022     BRA 0x9A
+96:                    PIR1bits.TMR2IF = 0;
+0056  929E     BCF PIR1, 1, ACCESS
+97:                    
+98:                    if(divisor < 199) {
+0058  5052     MOVF 0x52, W, ACCESS
+005A  E107     BNZ 0x6A
+005C  0EC7     MOVLW 0xC7
+005E  5C51     SUBWF divisor, W, ACCESS
+0060  B0D8     BTFSC STATUS, 0, ACCESS
+0062  D003     BRA 0x6A
+99:                        divisor++;
+0064  4A51     INFSNZ divisor, F, ACCESS
+0066  2A52     INCF 0x52, F, ACCESS
+100:                   } else {
+0068  D018     BRA 0x9A
+101:                       divisor = 0;
+006A  0E00     MOVLW 0x0
+006C  6E52     MOVWF 0x52, ACCESS
+006E  0E00     MOVLW 0x0
+0070  6E51     MOVWF divisor, ACCESS
+102:                       globalVar1++;
+0072  4A4F     INFSNZ globalVar1, F, ACCESS
+0074  2A50     INCF 0x50, F, ACCESS
+103:                       if (globalVar1 > 30000) {
+0076  BE50     BTFSC 0x50, 7, ACCESS
+0078  D00A     BRA 0x8E
+007A  0E31     MOVLW 0x31
+007C  5C4F     SUBWF globalVar1, W, ACCESS
+007E  0E75     MOVLW 0x75
+0080  5850     SUBWFB 0x50, W, ACCESS
+0082  A0D8     BTFSS STATUS, 0, ACCESS
+0084  D004     BRA 0x8E
+104:                           globalVar1 = 0;
+0086  0E00     MOVLW 0x0
+0088  6E50     MOVWF 0x50, ACCESS
+008A  0E00     MOVLW 0x0
+008C  6E4F     MOVWF globalVar1, ACCESS
+105:                       }
+106:                       lcd_number(globalVar1);
+008E  C04F     MOVFF globalVar1, number
+0090  F019     NOP
+0092  C050     MOVFF 0x50, 0x1A
+0094  F01A     NOP
+0096  EC86     CALL 0x50C, 0
+0098  F002     NOP
+107:                   }
+108:               }
+109:               
+110:               if (PIR1bits.RC1IF) {
+009A  AA9E     BTFSS PIR1, 5, ACCESS
+009C  D023     BRA 0xE4
+111:                   if (RCSTA1bits.OERR) {
+009E  A2AB     BTFSS RCSTA1, 1, ACCESS
+00A0  D004     BRA 0xAA
+112:                       RCSTA1bits.CREN = 0;
+00A2  98AB     BCF RCSTA1, 4, ACCESS
+113:                       asm("NOP");
+00A4  F000     NOP
+114:                       RCSTA1bits.CREN = 1;
+00A6  88AB     BSF RCSTA1, 4, ACCESS
+115:                   } else {
+00A8  D01D     BRA 0xE4
+116:                       if (RCSTA1bits.FERR) {
+00AA  A4AB     BTFSS RCSTA1, 2, ACCESS
+00AC  D005     BRA 0xB8
+117:                           k1 = RCREG1;
+00AE  CFAE     MOVFF RCREG1, k1
+00B0  F054     NOP
+118:                           k1 = 0;
+00B2  0E00     MOVLW 0x0
+00B4  6E54     MOVWF k1, ACCESS
+119:                           // issue warning command
+120:                       } else {
+00B6  D016     BRA 0xE4
+121:                           *(buff1 + k1) = RCREG1;
+00B8  5054     MOVF k1, W, ACCESS
+00BA  0D01     MULLW 0x1
+00BC  0E89     MOVLW 0x89
+00BE  24F3     ADDWF PROD, W, ACCESS
+00C0  6ED9     MOVWF FSR2, ACCESS
+00C2  0E00     MOVLW 0x0
+00C4  20F4     ADDWFC PRODH, W, ACCESS
+00C6  6EDA     MOVWF FSR2H, ACCESS
+00C8  CFAE     MOVFF RCREG1, INDF2
+00CA  FFDF     NOP
+122:                           if (*(buff1 + k1) != '\n') {
+00CC  5054     MOVF k1, W, ACCESS
+00CE  0D01     MULLW 0x1
+00D0  0E89     MOVLW 0x89
+00D2  24F3     ADDWF PROD, W, ACCESS
+00D4  6ED9     MOVWF FSR2, ACCESS
+00D6  0E00     MOVLW 0x0
+00D8  20F4     ADDWFC PRODH, W, ACCESS
+00DA  6EDA     MOVWF FSR2H, ACCESS
+00DC  0E0A     MOVLW 0xA
+00DE  18DE     XORWF POSTINC2, W, ACCESS
+00E0  A4D8     BTFSS STATUS, 2, ACCESS
+123:                               k1++;
+00E2  2A54     INCF k1, F, ACCESS
+124:                           }
+125:                       }
+126:                   }
+127:               }
+128:               
+129:               if (PIR3bits.RC2IF) {
+00E4  AAA4     BTFSS PIR3, 5, ACCESS
+00E6  D042     BRA 0x16C
+130:                   if (RCSTA2bits.OERR) {
+00E8  A2A6     BTFSS RCSTA2, 1, ACCESS
+00EA  D004     BRA 0xF4
+131:                       RCSTA2bits.CREN = 0;
+00EC  98A6     BCF RCSTA2, 4, ACCESS
+132:                       asm("NOP");
+00EE  F000     NOP
+133:                       RCSTA2bits.CREN = 1;
+00F0  88A6     BSF RCSTA2, 4, ACCESS
+134:                   } else {
+00F2  D012     BRA 0x118
+135:                       if (RCSTA2bits.FERR) {
+00F4  A4A6     BTFSS RCSTA2, 2, ACCESS
+00F6  D005     BRA 0x102
+136:                           k2 = RCREG2;
+00F8  CF7A     MOVFF RCREG2, k2
+00FA  F053     NOP
+137:                           k2 = 0;
+00FC  0E00     MOVLW 0x0
+00FE  6E53     MOVWF k2, ACCESS
+138:                           // issue warning command
+139:                       } else {
+0100  D00B     BRA 0x118
+140:                           *(buff2 + k2) = RCREG2;
+0102  5053     MOVF k2, W, ACCESS
+0104  0D01     MULLW 0x1
+0106  0E40     MOVLW 0x40
+0108  24F3     ADDWF PROD, W, ACCESS
+010A  6ED9     MOVWF FSR2, ACCESS
+010C  0E00     MOVLW 0x0
+010E  20F4     ADDWFC PRODH, W, ACCESS
+0110  6EDA     MOVWF FSR2H, ACCESS
+0112  CF7A     MOVFF RCREG2, INDF2
+0114  FFDF     NOP
+141:                           k2++;
+0116  2A53     INCF k2, F, ACCESS
+142:                       }
+143:                   }
+144:                   
+145:                   if (buff2[k2-1] == '\n') {
+0118  0EFF     MOVLW 0xFF
+011A  6E28     MOVWF 0x28, ACCESS
+011C  0EFF     MOVLW 0xFF
+011E  6E29     MOVWF 0x29, ACCESS
+0120  5053     MOVF k2, W, ACCESS
+0122  6E2A     MOVWF 0x2A, ACCESS
+0124  6A2B     CLRF 0x2B, ACCESS
+0126  5028     MOVF 0x28, W, ACCESS
+0128  262A     ADDWF 0x2A, F, ACCESS
+012A  5029     MOVF 0x29, W, ACCESS
+012C  222B     ADDWFC 0x2B, F, ACCESS
+012E  0E40     MOVLW 0x40
+0130  242A     ADDWF 0x2A, W, ACCESS
+0132  6ED9     MOVWF FSR2, ACCESS
+0134  0E00     MOVLW 0x0
+0136  202B     ADDWFC 0x2B, W, ACCESS
+0138  6EDA     MOVWF FSR2H, ACCESS
+013A  0E0A     MOVLW 0xA
+013C  18DE     XORWF POSTINC2, W, ACCESS
+013E  A4D8     BTFSS STATUS, 2, ACCESS
+0140  D015     BRA 0x16C
+146:                       for (char i=0;i<k2;i++) {
+0142  0E00     MOVLW 0x0
+0144  6E3F     MOVWF i, ACCESS
+0146  D00C     BRA 0x160
+015E  2A3F     INCF i, F, ACCESS
+0160  5053     MOVF k2, W, ACCESS
+0162  5C3F     SUBWF i, W, ACCESS
+0164  A0D8     BTFSS STATUS, 0, ACCESS
+0166  D7F0     BRA 0x148
+147:                           putch(buff2[i]);
+0148  503F     MOVF i, W, ACCESS
+014A  0D01     MULLW 0x1
+014C  0E40     MOVLW 0x40
+014E  24F3     ADDWF PROD, W, ACCESS
+0150  6ED9     MOVWF FSR2, ACCESS
+0152  0E00     MOVLW 0x0
+0154  20F4     ADDWFC PRODH, W, ACCESS
+0156  6EDA     MOVWF FSR2H, ACCESS
+0158  50DF     MOVF INDF2, W, ACCESS
+015A  EC03     CALL 0x1206, 0
+015C  F009     NOP
+148:                       }
+149:                       k2 = 0;
+0168  0E00     MOVLW 0x0
+016A  6E53     MOVWF k2, ACCESS
+150:                   }
+151:               }
+152:           }
+016C  C03E     MOVFF 0x3E, 0x5D
+016E  F05D     NOP
+0170  C03D     MOVFF 0x3D, 0x5C
+0172  F05C     NOP
+0174  C03C     MOVFF 0x3C, 0x5B
+0176  F05B     NOP
+0178  C03B     MOVFF 0x3B, btemp
+017A  F05A     NOP
+017C  C03A     MOVFF 0x3A, TABLAT
+017E  FFF5     NOP
+0180  C039     MOVFF 0x39, TBLPTRU
+0182  FFF8     NOP
+0184  C038     MOVFF 0x38, TBLPTRH
+0186  FFF7     NOP
+0188  C037     MOVFF 0x37, TBLPTR
+018A  FFF6     NOP
+018C  C036     MOVFF 0x36, PRODH
+018E  FFF4     NOP
+0190  C035     MOVFF 0x35, PROD
+0192  FFF3     NOP
+0194  C034     MOVFF 0x34, FSR2H
+0196  FFDA     NOP
+0198  C033     MOVFF 0x33, FSR2
+019A  FFD9     NOP
+019C  C032     MOVFF 0x32, FSR1H
+019E  FFE2     NOP
+01A0  C031     MOVFF 0x31, FSR1
+01A2  FFE1     NOP
+01A4  C030     MOVFF 0x30, FSR0H
+01A6  FFEA     NOP
+01A8  C02F     MOVFF 0x2F, FSR0
+01AA  FFE9     NOP
+01AC  C02E     MOVFF 0x2E, PCLATU
+01AE  FFFB     NOP
+01B0  C02D     MOVFF 0x2D, PCLATH
+01B2  FFFA     NOP
+01B4  925A     BCF btemp, 1, ACCESS
+01B6  0011     RETFIE 1
+153:           
+154:           void main(void) {
+155:               /* Oscillator configuration */
+156:               OSCCON = 0b01110000;
+0916  0E70     MOVLW 0x70
+0918  6ED3     MOVWF OSCCON, ACCESS
+157:               OSCTUNE = 0b01000000;
+091A  0E40     MOVLW 0x40
+091C  6E9B     MOVWF OSCTUNE, ACCESS
+158:               
+159:               /* PIN configuration */
+160:               TRISA = 0x00;
+091E  0E00     MOVLW 0x0
+0920  6E92     MOVWF TRISA, ACCESS
+161:               TRISB = 0x00;
+0922  0E00     MOVLW 0x0
+0924  6E93     MOVWF TRISB, ACCESS
+162:               TRISC = 0xBF;
+0926  0EBF     MOVLW 0xBF
+0928  6E94     MOVWF TRISC, ACCESS
+163:               TRISD = 0xBF;
+092A  0EBF     MOVLW 0xBF
+092C  6E95     MOVWF TRISD, ACCESS
+164:               ANCON0 = 0x00;
+092E  0E00     MOVLW 0x0
+0930  010F     MOVLB 0xF
+0932  6F5D     MOVWF 0x5D, BANKED
+165:               ANCON1 = 0x00;
+0934  0E00     MOVLW 0x0
+0936  6F5C     MOVWF 0x5C, BANKED
+166:               
+167:               /* Interrupt configuration */
+168:               INTCON = 0b11000000;
+0938  0EC0     MOVLW 0xC0
+093A  6EF2     MOVWF INTCON, ACCESS
+169:               
+170:               /* UART configuration */
+171:               uart1_config(9600);
+093C  0E80     MOVLW 0x80
+093E  0100     MOVLB 0x0
+0940  6F6D     MOVWF baudRate, BANKED
+0942  0E25     MOVLW 0x25
+0944  6F6E     MOVWF c, BANKED
+0946  0E00     MOVLW 0x0
+0948  6F6F     MOVWF size, BANKED
+094A  0E00     MOVLW 0x0
+094C  6F70     MOVWF 0x70, BANKED
+094E  EC75     CALL 0xEEA, 0
+0950  F007     NOP
+172:               uart2_config(9600);
+0952  0E80     MOVLW 0x80
+0954  0100     MOVLB 0x0
+0956  6F6D     MOVWF baudRate, BANKED
+0958  0E25     MOVLW 0x25
+095A  6F6E     MOVWF c, BANKED
+095C  0E00     MOVLW 0x0
+095E  6F6F     MOVWF size, BANKED
+0960  0E00     MOVLW 0x0
+0962  6F70     MOVWF 0x70, BANKED
+0964  EC37     CALL 0xE6E, 0
+0966  F007     NOP
+173:               
+174:               __delay_ms(1000);    // to wait for the LCD display to power on
+0968  0E52     MOVLW 0x52
+096A  0100     MOVLB 0x0
+096C  6F88     MOVWF 0x88, BANKED
+096E  0E2B     MOVLW 0x2B
+0970  6F87     MOVWF 0x87, BANKED
+0972  0E00     MOVLW 0x0
+0974  2EE8     DECFSZ WREG, F, ACCESS
+0976  D7FE     BRA 0x974
+0978  2F87     DECFSZ 0x87, F, BANKED
+097A  D7FC     BRA 0x974
+097C  2F88     DECFSZ 0x88, F, BANKED
+097E  D7FA     BRA 0x974
+0980  F000     NOP
+175:               lcd_init();
+0982  EC54     CALL 0x6A8, 0
+0984  F003     NOP
+176:               lcd_set_background(0xFFFF);
+0986  0EFF     MOVLW 0xFF
+0988  0100     MOVLB 0x0
+098A  6F6B     MOVWF 0x6B, BANKED
+098C  696A     SETF x, BANKED
+098E  ECB3     CALL 0xF66, 0
+0990  F007     NOP
+177:               __delay_ms(1);
+0992  0E15     MOVLW 0x15
+0994  0100     MOVLB 0x0
+0996  6F87     MOVWF 0x87, BANKED
+0998  0EC6     MOVLW 0xC6
+099A  2EE8     DECFSZ WREG, F, ACCESS
+099C  D7FE     BRA 0x99A
+099E  2F87     DECFSZ 0x87, F, BANKED
+09A0  D7FC     BRA 0x99A
+09A2  F000     NOP
+178:               lcd_point(0);
+09A4  0E00     MOVLW 0x0
+09A6  EC96     CALL 0xD2C, 0
+09A8  F006     NOP
+179:               strcpy(lcdText, "ACA SOMOS TODOS");
+09AA  0E98     MOVLW 0x98
+09AC  0100     MOVLB 0x0
+09AE  6F60     MOVWF __pcstackBANK0, BANKED
+09B0  0E00     MOVLW 0x0
+09B2  6F61     MOVWF cmd, BANKED
+09B4  0EEF     MOVLW 0xEF
+09B6  6F62     MOVWF position, BANKED
+09B8  0EFF     MOVLW 0xFF
+09BA  6F63     MOVWF option, BANKED
+09BC  EC97     CALL 0x112E, 0
+09BE  F008     NOP
+180:               lcd_text(1,lcdText);
+09C0  0E98     MOVLW 0x98
+09C2  0100     MOVLB 0x0
+09C4  6F77     MOVWF msjPtr, BANKED
+09C6  0E00     MOVLW 0x0
+09C8  6F78     MOVWF 0x78, BANKED
+09CA  0E01     MOVLW 0x1
+09CC  ECB2     CALL 0x364, 0
+09CE  F001     NOP
+181:               strcpy(lcdText, "MEDIO DIESTROS ");
+09D0  0E98     MOVLW 0x98
+09D2  0100     MOVLB 0x0
+09D4  6F60     MOVWF __pcstackBANK0, BANKED
+09D6  0E00     MOVLW 0x0
+09D8  6F61     MOVWF cmd, BANKED
+09DA  0EDF     MOVLW 0xDF
+09DC  6F62     MOVWF position, BANKED
+09DE  0EFF     MOVLW 0xFF
+09E0  6F63     MOVWF option, BANKED
+09E2  EC97     CALL 0x112E, 0
+09E4  F008     NOP
+182:               lcd_text_color(2,lcdText);
+09E6  0E98     MOVLW 0x98
+09E8  0100     MOVLB 0x0
+09EA  6F77     MOVWF msjPtr, BANKED
+09EC  0E00     MOVLW 0x0
+09EE  6F78     MOVWF 0x78, BANKED
+09F0  0E02     MOVLW 0x2
+09F2  ECDE     CALL 0x1BC, 0
+09F4  F000     NOP
+183:               strcpy(lcdText, "DIRIA EL FACHA ");
+09F6  0E98     MOVLW 0x98
+09F8  0100     MOVLB 0x0
+09FA  6F60     MOVWF __pcstackBANK0, BANKED
+09FC  0E00     MOVLW 0x0
+09FE  6F61     MOVWF cmd, BANKED
+0A00  0ECF     MOVLW 0xCF
+0A02  6F62     MOVWF position, BANKED
+0A04  0EFF     MOVLW 0xFF
+0A06  6F63     MOVWF option, BANKED
+0A08  EC97     CALL 0x112E, 0
+0A0A  F008     NOP
+184:               lcd_text(3,lcdText);
+0A0C  0E98     MOVLW 0x98
+0A0E  0100     MOVLB 0x0
+0A10  6F77     MOVWF msjPtr, BANKED
+0A12  0E00     MOVLW 0x0
+0A14  6F78     MOVWF 0x78, BANKED
+0A16  0E03     MOVLW 0x3
+0A18  ECB2     CALL 0x364, 0
+0A1A  F001     NOP
+185:               
+186:               
+187:               /* Timer 2 configuration */
+188:               timer2_config(PRE16, 10, 100);
+0A1C  0E0A     MOVLW 0xA
+0A1E  0100     MOVLB 0x0
+0A20  6F60     MOVWF __pcstackBANK0, BANKED
+0A22  0E64     MOVLW 0x64
+0A24  6F61     MOVWF cmd, BANKED
+0A26  0E02     MOVLW 0x2
+0A28  ECB0     CALL 0x1160, 0
+0A2A  F008     NOP
+189:               
+190:               while (1);
+0A2C  D7FF     BRA 0xA2C
+191:               return;
+192:           }
+---  C:/Program Files (x86)/Microchip/xc8/v1.45/sources/common/strcpy.c  --------------------------------
+1:             #include	<string.h>
+2:             
+3:             #ifdef _PIC16
+4:             far char *
+5:             strcpy(far char * to, register const char * from)
+6:             #else /* _PIC16 */
+7:             char *
+8:             strcpy(char * to, register const char * from)
+9:             #endif /* _PIC16 */
+10:            {
+11:            
+12:            #ifdef _PIC16
+13:            	register far char *	cp;
+14:            #else /* _PIC16 */
+15:            	register char *	cp;
+16:            #endif /* _PIC16 */
+17:            
+18:            	cp = to;
+112E  C060     MOVFF __pcstackBANK0, y1
+1130  F064     NOP
+1132  C061     MOVFF cmd, 0x65
+1134  F065     NOP
+19:            	while (*cp = *from) {
+1136  D005     BRA 0x1142
+20:            		cp++;
+1138  0100     MOVLB 0x0
+113A  4B64     INFSNZ y1, F, BANKED
+113C  2B65     INCF 0x65, F, BANKED
+21:            		from++;
+113E  4B62     INFSNZ position, F, BANKED
+1140  2B63     INCF option, F, BANKED
+22:            	}
+1142  C062     MOVFF position, TBLPTR
+1144  FFF6     NOP
+1146  C063     MOVFF option, TBLPTRH
+1148  FFF7     NOP
+114A  C064     MOVFF y1, FSR2
+114C  FFD9     NOP
+114E  C065     MOVFF 0x65, FSR2H
+1150  FFDA     NOP
+1152  0008     TBLRD*
+1154  CFF5     MOVFF TABLAT, INDF2
+1156  FFDF     NOP
+1158  50DF     MOVF INDF2, W, ACCESS
+115A  B4D8     BTFSC STATUS, 2, ACCESS
+115C  0012     RETURN 0
+115E  D7EC     BRA 0x1138
+23:            	return to;
+24:            }
+---  C:/Program Files (x86)/Microchip/xc8/v1.45/sources/common/lldiv.c  ---------------------------------
+1:             // long unsigned unsigned division
+2:             
+3:             unsigned long int
+4:             #ifdef __PICC__
+5:             #warning TODO: update cgpic and this file to use the other prototype
+6:             __lldiv(unsigned long int divisor, unsigned long int dividend)
+7:             #else
+8:             __lldiv(unsigned long int dividend, unsigned long int divisor)
+9:             #endif
+10:            {
+11:            	unsigned long int	quotient;
+12:            	unsigned char	counter;
+13:            
+14:            	quotient = 0;
+0DEA  0E00     MOVLW 0x0
+0DEC  0100     MOVLB 0x0
+0DEE  6F68     MOVWF y2, BANKED
+0DF0  0E00     MOVLW 0x0
+0DF2  6F69     MOVWF 0x69, BANKED
+0DF4  0E00     MOVLW 0x0
+0DF6  6F6A     MOVWF x, BANKED
+0DF8  0E00     MOVLW 0x0
+0DFA  6F6B     MOVWF 0x6B, BANKED
+15:            	if(divisor != 0) {
+0DFC  5164     MOVF y1, W, BANKED
+0DFE  1165     IORWF 0x65, W, BANKED
+0E00  1166     IORWF x2, W, BANKED
+0E02  1167     IORWF 0x67, W, BANKED
+0E04  B4D8     BTFSC STATUS, 2, ACCESS
+0E06  D02A     BRA 0xE5C
+16:            		counter = 1;
+0E08  0E01     MOVLW 0x1
+0E0A  6F6C     MOVWF y, BANKED
+17:            		while((divisor & 0x80000000UL) == 0) {
+0E0C  D006     BRA 0xE1A
+18:            			divisor <<= 1;
+0E0E  90D8     BCF STATUS, 0, ACCESS
+0E10  3764     RLCF y1, F, BANKED
+0E12  3765     RLCF 0x65, F, BANKED
+0E14  3766     RLCF x2, F, BANKED
+0E16  3767     RLCF 0x67, F, BANKED
+19:            			counter++;
+0E18  2B6C     INCF y, F, BANKED
+20:            		}
+0E1A  AF67     BTFSS 0x67, 7, BANKED
+0E1C  D7F8     BRA 0xE0E
+21:            		do {
+22:            			quotient <<= 1;
+0E1E  90D8     BCF STATUS, 0, ACCESS
+0E20  3768     RLCF y2, F, BANKED
+0E22  3769     RLCF 0x69, F, BANKED
+0E24  376A     RLCF x, F, BANKED
+0E26  376B     RLCF 0x6B, F, BANKED
+23:            			if(divisor <= dividend) {
+0E28  5164     MOVF y1, W, BANKED
+0E2A  5D60     SUBWF __pcstackBANK0, W, BANKED
+0E2C  5165     MOVF 0x65, W, BANKED
+0E2E  5961     SUBWFB cmd, W, BANKED
+0E30  5166     MOVF x2, W, BANKED
+0E32  5962     SUBWFB position, W, BANKED
+0E34  5167     MOVF 0x67, W, BANKED
+0E36  5963     SUBWFB option, W, BANKED
+0E38  A0D8     BTFSS STATUS, 0, ACCESS
+0E3A  D009     BRA 0xE4E
+24:            				dividend -= divisor;
+0E3C  5164     MOVF y1, W, BANKED
+0E3E  5F60     SUBWF __pcstackBANK0, F, BANKED
+0E40  5165     MOVF 0x65, W, BANKED
+0E42  5B61     SUBWFB cmd, F, BANKED
+0E44  5166     MOVF x2, W, BANKED
+0E46  5B62     SUBWFB position, F, BANKED
+0E48  5167     MOVF 0x67, W, BANKED
+0E4A  5B63     SUBWFB option, F, BANKED
+25:            				quotient |= 1;
+0E4C  8168     BSF y2, 0, BANKED
+26:            			}
+27:            			divisor >>= 1;
+0E4E  90D8     BCF STATUS, 0, ACCESS
+0E50  3367     RRCF 0x67, F, BANKED
+0E52  3366     RRCF x2, F, BANKED
+0E54  3365     RRCF 0x65, F, BANKED
+0E56  3364     RRCF y1, F, BANKED
+28:            		} while(--counter != 0);
+0E58  2F6C     DECFSZ y, F, BANKED
+0E5A  D7E1     BRA 0xE1E
+29:            	}
+30:            	return quotient;
+0E5C  C068     MOVFF y2, __pcstackBANK0
+0E5E  F060     NOP
+0E60  C069     MOVFF 0x69, cmd
+0E62  F061     NOP
+0E64  C06A     MOVFF x, position
+0E66  F062     NOP
+0E68  C06B     MOVFF 0x6B, option
+0E6A  F063     NOP
+31:            }
+0E6C  0012     RETURN 0
+---  C:/Program Files (x86)/Microchip/xc8/v1.45/sources/common/Umul16.c  --------------------------------
+1:             // 16 x 16 bit multiplication with 16 bit result
+2:             #ifdef _PIC18
+3:             #define _Has_hardware_multiply 1
+4:             #else
+5:             #define _Has_hardware_multiply 0
+6:             #endif
+7:             
+8:             #if defined(_PIC14E) || defined(_PIC14EX) || defined(_PIC18)
+9:             #define _Has_large_call_stack 1
+10:            #else
+11:            #define _Has_large_call_stack 0
+12:            #endif
+13:            
+14:            unsigned int
+15:            __wmul(unsigned int multiplier, unsigned int multiplicand)
+16:            {
+17:                    unsigned int product;
+18:            
+19:            #if _Has_hardware_multiply || _Has_large_call_stack
+20:            
+21:            #define LOWBYTE(x)  (*(unsigned char *)(&x))
+22:            #define HIGHBYTE(x) (*(((unsigned char *)(&x))+1))
+23:            
+24:            	// optimized to allow use of the 8 x 8 bit hardware multiply instruction
+25:            /*
+26:            a 16-bit multiply can be decomposed into the sum of three 8-bit multiplies
+27:                   a  b
+28:            *      c  d
+29:            -----------
+30:                 |   bd
+31:                 |ad  0
+32:                 |bc  0
+33:            +  ac| 0  0 (we ignore this intermediate product
+34:                         because it does not affect the low 16 bits of the result)
+35:            ===========
+36:             */
+37:                    product =  LOWBYTE(multiplier) * LOWBYTE(multiplicand);
+118A  0100     MOVLB 0x0
+118C  5160     MOVF __pcstackBANK0, W, BANKED
+118E  0362     MULWF position, BANKED
+1190  CFF3     MOVFF PROD, y1
+1192  F064     NOP
+1194  CFF4     MOVFF PRODH, 0x65
+1196  F065     NOP
+11B2  5001     MOVF __pcstackCOMRAM, W, ACCESS
+38:                    product += (LOWBYTE(multiplier) * HIGHBYTE(multiplicand)) << 8;
+1198  5160     MOVF __pcstackBANK0, W, BANKED
+119A  0363     MULWF option, BANKED
+119C  50F3     MOVF PROD, W, ACCESS
+119E  2765     ADDWF 0x65, F, BANKED
+11BE  5001     MOVF __pcstackCOMRAM, W, ACCESS
+11C0  0204     MULWF 0x4, ACCESS
+11C2  50F3     MOVF PROD, W, ACCESS
+11C4  2606     ADDWF 0x6, F, ACCESS
+39:                    product += (HIGHBYTE(multiplier) * LOWBYTE(multiplicand)) << 8;
+11A0  5161     MOVF cmd, W, BANKED
+11A2  0362     MULWF position, BANKED
+11A4  50F3     MOVF PROD, W, ACCESS
+11A6  2765     ADDWF 0x65, F, BANKED
+11C6  5002     MOVF cmd, W, ACCESS
+11C8  0203     MULWF position, ACCESS
+11CA  50F3     MOVF PROD, W, ACCESS
+11CC  2606     ADDWF 0x6, F, ACCESS
+40:            
+41:            #else
+42:            
+43:            	product = 0;
+44:            	do {
+45:            		if(multiplier & 1)
+46:            			product += multiplicand;
+47:            		multiplicand <<= 1;
+48:            		multiplier >>= 1;
+49:            	} while(multiplier != 0);
+50:            
+51:            #endif
+52:                    return product;
+11A8  C064     MOVFF y1, __pcstackBANK0
+11AA  F060     NOP
+11AC  C065     MOVFF 0x65, cmd
+11AE  F061     NOP
+11B0  0012     RETURN 0
+11CE  C005     MOVFF y1, __pcstackCOMRAM
+11D0  F001     NOP
+11D2  C006     MOVFF 0x6, cmd
+11D4  F002     NOP
+11D6  0012     RETURN 0
+53:            }
